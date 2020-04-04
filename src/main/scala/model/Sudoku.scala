@@ -1,3 +1,3 @@
 package model
 
-case class Sudoku(val rowSudoku:List[ValueSudoku])
+case class Sudoku(val rowSudoku:Array[ValueSudoku])
