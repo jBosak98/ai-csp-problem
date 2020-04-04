@@ -23,7 +23,7 @@ object loadSudokus {
                             singleValue = _toInt(sudokuNumber)
                             valueSudoku = new ValueSudoku(singleValue, singleValue.isDefined)
                             } yield valueSudoku
-    Sudoku(sudokuValues.toArray)
+    new Sudoku(sudokuValues.toArray)
   }
 
   private def _toInt(i: Char): Option[Int] = i match {
