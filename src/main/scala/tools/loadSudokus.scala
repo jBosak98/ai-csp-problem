@@ -1,6 +1,7 @@
 package tools
 
-import model.{Sudoku, ValueSudoku}
+import model.Sudoku
+import model.types.Domain
 
 import scala.io.Source.fromFile
 
@@ -19,11 +20,12 @@ object loadSudokus {
 
   private def _loadSudoku(line: String): Sudoku = {
     val values = line.split(';')(2)
-    val sudokuValues = for {sudokuNumber <- values
+    val loadedSudoku = for {sudokuNumber <- values
                             singleValue = _toInt(sudokuNumber)
-                            valueSudoku = new ValueSudoku(singleValue, singleValue.isDefined)
-                            } yield valueSudoku
-    new Sudoku(sudokuValues.toArray)
+                            } yield (singleValue, singleValue.isDefined)
+    val (sudokuValues, isConstant) = loadedSudoku.toArray.unzip
+    val domains = Array.fill[Domain](sudokuValues.length)(List[Int]())
+    Sudoku(sudokuValues, domains,isConstant)
   }
 
   private def _toInt(i: Char): Option[Int] = i match {
