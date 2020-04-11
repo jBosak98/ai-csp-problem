@@ -1,23 +1,24 @@
 package tools
 
-import model.Sudoku
+import model.CSPProblem
 import tools.calculateDomain.calculateDomainOfIndex
 import tools.sudokuTools._
 
-object resolveSudoku {
+object resolveSudoku extends resolveCSP {
 
-  def resolveSudoku(sudoku: Sudoku): Boolean = {
-    val position = getNextIndexToResolve(sudoku)
+  def resolveProblem(problem:
+                     CSPProblem, tools:CSPTools = null): Boolean = {
+    val position = getNextIndexToResolve(problem)
     if (position.isDefined) {
-      resolveField(sudoku, position.get)
+      resolveField(problem, position.get)
     }
 
-    val isSolved = isSudokuProperlyResolved(sudoku)
+    val isSolved = isProperlyResolved(problem)
     if (!isSolved) println("Sudoku has no solution")
     isSolved
   }
 
-  def resolveField(sudoku: Sudoku, index: Int): Boolean = {
+  def resolveField(sudoku: CSPProblem, index: Int): Boolean = {
     val domain = calculateDomainOfIndex(sudoku, index)
 
     def isValueProper: Int => Boolean = { value =>
@@ -31,7 +32,7 @@ object resolveSudoku {
           true
         } else {
           resolveField(sudoku, indexToResolve.get)
-          isSudokuProperlyFilled(sudoku)
+          isProperlyFilled(sudoku)
         }
       }
 
@@ -42,21 +43,21 @@ object resolveSudoku {
     true
   }
 
-  def getNextIndexToResolve(sudoku: Sudoku): Option[Int] = {
+  def getNextIndexToResolve(problem: CSPProblem, tools:CSPTools = null): Option[Int] = {
 
     def getOnlyEmptyValues: Int => Boolean = {
-      index => !sudoku.isConstant(index) && sudoku.values(index).isEmpty
+      index => !problem.isConstant(index) && problem.values(index).isEmpty
     }
 
-    val filteredIndexes: List[Int] = sudoku
+    val filteredIndexes: List[Int] = problem
       .values
       .indices
       .filter(getOnlyEmptyValues).toList
     if (filteredIndexes.isEmpty) return Option.empty[Int]
 
     val indexToResolve = filteredIndexes.reduce((acc: Int, e: Int) => {
-      sudoku.domains(e) = calculateDomainOfIndex(sudoku, e)
-      if (sudoku.domains(acc).length > sudoku.domains(e).length)
+      problem.domains(e) = calculateDomainOfIndex(problem, e)
+      if (problem.domains(acc).length > problem.domains(e).length)
         e
       else
         acc

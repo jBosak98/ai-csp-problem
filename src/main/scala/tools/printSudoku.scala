@@ -1,10 +1,11 @@
 package tools
 
-import model.Sudoku
+import model.CSPProblem
+
 
 object printSudoku {
 
-  def printSudoku(s: Sudoku) =
+  def printSudoku(s: CSPProblem) =
     (0 to 8)
       .foreach(row => {
         (0 to 8).foreach(column => {

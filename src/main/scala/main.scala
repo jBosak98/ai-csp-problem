@@ -14,7 +14,7 @@ object main {
     sudokus.foreach(s => {
       calculateDomain.calculateDomain(s)
       time += timer({
-        resolveSudoku.resolveSudoku(s)
+        resolveSudoku.resolveProblem(s)
       })
       printSudoku(s)
     })

@@ -1,23 +1,23 @@
 package tools
 
-import model.Sudoku
+import model.CSPProblem
 import scala.reflect.ClassTag
 
-object sudokuTools {
+object sudokuTools extends CSPTools{
   /*rowNumber scope = {1, ..., 9}
   columnNumber scope = {1, ..., 9}
   index scope = {0, ..., 80}
  */
 
-  def isSudokuProperlyResolved(sudoku: Sudoku): Boolean = {
-    areAllFieldsFilled(sudoku) && isSudokuProperlyFilled(sudoku)
+  def isProperlyResolved(sudoku: CSPProblem): Boolean = {
+    areAllFieldsFilled(sudoku) && isProperlyFilled(sudoku)
   }
 
-  def areAllFieldsFilled(sudoku: Sudoku): Boolean = {
+  def areAllFieldsFilled(sudoku: CSPProblem): Boolean = {
     !sudoku.values.exists(_.isEmpty)
   }
 
-  def isSudokuProperlyFilled(sudoku: Sudoku): Boolean = {
+  def isProperlyFilled(sudoku: CSPProblem): Boolean = {
 
     def isValueProperlyFilled: Int => Boolean = { index =>
       val valueSudoku = sudoku.values(index)
@@ -76,4 +76,6 @@ object sudokuTools {
     else values.indices.collect { case i
       if i % 9 == columnNumber - 1 => values(i)
     }.toArray
+
+
 }

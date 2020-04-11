@@ -1,18 +1,18 @@
 package tools
 
-import model.Sudoku
+import model.CSPProblem
 import model.types.ValueSudoku
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.{BeforeEach, Test}
 import tools.sudokuTools._
 
 class sudokuToolsTest {
-      var s1: Sudoku = _
+      var s1: CSPProblem = _
   @BeforeEach private[tools] def setUp() = {
-            s1 = Sudoku(
+            s1 = CSPProblem(
               values = (1 to 81).map(a => Option(a)).toArray,
               domains = Array.empty[List[Int]],
-              isConstant = Array.fill(80)(false)
+              isConstant = Array.fill(80)(false), (9,9)
             )
   }
 

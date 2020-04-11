@@ -1,11 +1,11 @@
 package tools
 
-import model.Sudoku
+import model.CSPProblem
 import model.types.Domain
 import sudokuTools._
 
 object calculateDomain {
-  def calculateDomain(sudoku: Sudoku): Sudoku = {
+  def calculateDomain(sudoku: CSPProblem): CSPProblem = {
 
     def filterDefinedValues: Int => Boolean = { index => sudoku.values(index).isEmpty && !sudoku.isConstant(index) }
 
@@ -23,7 +23,7 @@ object calculateDomain {
     sudoku
   }
 
-  def calculateDomainOfIndex(sudoku: Sudoku, index: Int): Domain = {
+  def calculateDomainOfIndex(sudoku: CSPProblem, index: Int): Domain = {
     val row = getRowAtIndex(sudoku.values, index)
     val column = getColumnAtIndex(sudoku.values, index)
     val box = getBox(sudoku.values, index)
@@ -32,7 +32,7 @@ object calculateDomain {
     domain
   }
 
-  def calculateDomainOfRelatedFields(sudoku: Sudoku, index:Int) = {
+  def calculateDomainOfRelatedFields(sudoku: CSPProblem, index:Int) = {
     val indexes = sudoku.values.indices.toArray
     val rowIndices = getRowAtIndex(indexes, index)
     val columnIndices = getColumnAtIndex(indexes, index)
@@ -45,7 +45,7 @@ object calculateDomain {
   }
 
 
-  def isDomainProper(sudoku: Sudoku): Boolean = {
+  def isDomainProper(sudoku: CSPProblem): Boolean = {
 
     def filterDefinedValues: Int => Boolean = { index => sudoku.values(index).isEmpty }
 
