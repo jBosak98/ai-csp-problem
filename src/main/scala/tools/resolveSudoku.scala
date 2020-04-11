@@ -22,15 +22,22 @@ object resolveSudoku {
 
     def isValueProper: Int => Boolean = { value =>
       sudoku.values(index) = Option(value)
-      val indexToResolve = getNextIndexToResolve(sudoku)
-      if (indexToResolve.isEmpty) {
-        true
+      calculateDomain.calculateDomainOfRelatedFields(sudoku, index)
+      if (!calculateDomain.isDomainProper(sudoku)) {
+        false
       } else {
-        resolveField(sudoku, indexToResolve.get)
-        isSudokuProperlyFilled(sudoku)
+        val indexToResolve = getNextIndexToResolve(sudoku)
+        if (indexToResolve.isEmpty) {
+          true
+        } else {
+          resolveField(sudoku, indexToResolve.get)
+          isSudokuProperlyFilled(sudoku)
+        }
       }
 
+
     }
+
     sudoku.values(index) = domain.find(isValueProper)
     true
   }
@@ -41,10 +48,20 @@ object resolveSudoku {
       index => !sudoku.isConstant(index) && sudoku.values(index).isEmpty
     }
 
-    sudoku
+    val filteredIndexes: List[Int] = sudoku
       .values
       .indices
-      .find(getOnlyEmptyValues)
+      .filter(getOnlyEmptyValues).toList
+    if (filteredIndexes.isEmpty) return Option.empty[Int]
+
+    val indexToResolve = filteredIndexes.reduce((acc: Int, e: Int) => {
+      sudoku.domains(e) = calculateDomainOfIndex(sudoku, e)
+      if (sudoku.domains(acc).length > sudoku.domains(e).length)
+        e
+      else
+        acc
+    })
+    Option(indexToResolve)
   }
 
 }

@@ -5,12 +5,13 @@ import model.types.Domain
 import sudokuTools._
 
 object calculateDomain {
-  def calculateDomain(sudoku: Sudoku, without: Int = -1): Sudoku = {
+  def calculateDomain(sudoku: Sudoku): Sudoku = {
+
+    def filterDefinedValues: Int => Boolean = { index => sudoku.values(index).isEmpty && !sudoku.isConstant(index) }
 
     def getDomainForEach: Int => Any = { index =>
-      val shouldNotBeCalculated = index == without || sudoku.isConstant(index) || sudoku.values(index).isDefined
       sudoku.domains(index) =
-        if(shouldNotBeCalculated) List[Int]()
+        if(filterDefinedValues(index)) List[Int]()
         else calculateDomainOfIndex(sudoku, index)
     }
 
@@ -29,6 +30,18 @@ object calculateDomain {
     val domainComplement = (row ++ column ++ box).filter(_.isDefined).map(_.get).distinct
     val domain = (1 to 9).toList.filter(e => !domainComplement.contains(e))
     domain
+  }
+
+  def calculateDomainOfRelatedFields(sudoku: Sudoku, index:Int) = {
+    val indexes = sudoku.values.indices.toArray
+    val rowIndices = getRowAtIndex(indexes, index)
+    val columnIndices = getColumnAtIndex(indexes, index)
+    val boxIndices = getBox(indexes, index)
+
+    val valuesToCalculate = (rowIndices ++ columnIndices ++ boxIndices).distinct
+    valuesToCalculate.foreach(index => {
+      sudoku.domains(index) = calculateDomainOfIndex(sudoku, index)
+    })
   }
 
 
