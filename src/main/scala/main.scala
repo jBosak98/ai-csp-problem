@@ -1,7 +1,7 @@
 import tools.loadSudokus.loadSudokus
 import tools.printSudoku.printSudoku
 import tools.timer.timer
-import tools.{calculateDomain, resolveSudoku}
+import tools.{SudokuResolver, calculateDomain, sudokuTools}
 
 object main {
 
@@ -11,10 +11,11 @@ object main {
 
 //    printSudoku(sudokus.head)
     var time = 0L
+    val sudokuResolver = new SudokuResolver(sudokuTools)
     sudokus.foreach(s => {
       calculateDomain.calculateDomain(s)
       time += timer({
-        resolveSudoku.resolveProblem(s)
+        sudokuResolver.resolveProblem(s)
       })
       printSudoku(s)
     })

@@ -2,19 +2,17 @@ package tools
 
 import model.CSPProblem
 import tools.calculateDomain.calculateDomainOfIndex
-import tools.sudokuTools._
 
-object resolveSudoku extends resolveCSP {
+class SudokuResolver(val tools:CSPTools) extends resolveCSP {
 
-  def resolveProblem(problem:
-                     CSPProblem, tools:CSPTools = null): Boolean = {
+  def resolveProblem(problem:  CSPProblem): Boolean = {
     val position = getNextIndexToResolve(problem)
     if (position.isDefined) {
       resolveField(problem, position.get)
     }
 
-    val isSolved = isProperlyResolved(problem)
-    if (!isSolved) println("Sudoku has no solution")
+    val isSolved = tools.isProperlyResolved(problem)
+    if (!isSolved) println("Problem has no solution")
     isSolved
   }
 
@@ -32,7 +30,7 @@ object resolveSudoku extends resolveCSP {
           true
         } else {
           resolveField(sudoku, indexToResolve.get)
-          isProperlyFilled(sudoku)
+          tools.isProperlyFilled(sudoku)
         }
       }
 
@@ -43,7 +41,7 @@ object resolveSudoku extends resolveCSP {
     true
   }
 
-  def getNextIndexToResolve(problem: CSPProblem, tools:CSPTools = null): Option[Int] = {
+  def getNextIndexToResolve(problem: CSPProblem): Option[Int] = {
 
     def getOnlyEmptyValues: Int => Boolean = {
       index => !problem.isConstant(index) && problem.values(index).isEmpty

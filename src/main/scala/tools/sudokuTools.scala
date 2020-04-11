@@ -3,7 +3,7 @@ package tools
 import model.CSPProblem
 import scala.reflect.ClassTag
 
-object sudokuTools extends CSPTools{
+object sudokuTools extends CSPTools {
   /*rowNumber scope = {1, ..., 9}
   columnNumber scope = {1, ..., 9}
   index scope = {0, ..., 80}
