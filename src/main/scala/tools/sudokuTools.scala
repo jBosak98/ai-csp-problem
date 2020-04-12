@@ -9,26 +9,26 @@ object sudokuTools extends CSPTools {
   index scope = {0, ..., 80}
  */
 
-  def isProperlyResolved(sudoku: CSPProblem): Boolean = {
+  def isProperlyResolved[T](sudoku: CSPProblem[T]): Boolean = {
     areAllFieldsFilled(sudoku) && isProperlyFilled(sudoku)
   }
 
-  def areAllFieldsFilled(sudoku: CSPProblem): Boolean = {
-    !sudoku.values.exists(_.isEmpty)
+  def areAllFieldsFilled[T](sudoku: CSPProblem[T]): Boolean = {
+    !sudoku.variables.exists(_.isEmpty)
   }
 
-  def isProperlyFilled(sudoku: CSPProblem): Boolean = {
+  def isProperlyFilled[T](sudoku: CSPProblem[T]): Boolean = {
 
     def isValueProperlyFilled: Int => Boolean = { index =>
-      val valueSudoku = sudoku.values(index)
-      val row = getRowAtIndex(sudoku.values, index).filter(_.eq(valueSudoku))
-      val column = getColumnAtIndex(sudoku.values, index).filter(_.eq(valueSudoku))
-      val box = getBox(sudoku.values, index).filter(_.eq(valueSudoku))
+      val valueSudoku = sudoku.variables(index)
+      val row = getRowAtIndex(sudoku.variables, index).filter(_.eq(valueSudoku))
+      val column = getColumnAtIndex(sudoku.variables, index).filter(_.eq(valueSudoku))
+      val box = getBox(sudoku.variables, index).filter(_.eq(valueSudoku))
       !(row.length == 1 && column.length == 1 && box.length == 1)
     }
 
     !sudoku
-      .values
+      .variables
       .indices
       .exists(isValueProperlyFilled)
   }

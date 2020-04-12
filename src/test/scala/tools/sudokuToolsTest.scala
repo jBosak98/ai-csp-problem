@@ -7,12 +7,15 @@ import org.junit.jupiter.api.{BeforeEach, Test}
 import tools.sudokuTools._
 
 class sudokuToolsTest {
-      var s1: CSPProblem = _
+      var s1: CSPProblem[Int] = _
   @BeforeEach private[tools] def setUp() = {
             s1 = CSPProblem(
-              values = (1 to 81).map(a => Option(a)).toArray,
+              variables = (1 to 81).map(a => Option(a)).toArray,
               domains = Array.empty[List[Int]],
-              isConstant = Array.fill(80)(false), (9,9)
+              isConstant = Array.fill(80)(false),
+              size = (9,9),
+              constraint = {(_,_) => Nil},
+              availableValues = List.range(1, 10)
             )
   }
 
@@ -34,32 +37,32 @@ class sudokuToolsTest {
   }
 
   @Test private[tools] def getColumnAtIndexTest() = {
-    assertEquals(9, getColumnAtIndex(s1.values, 80).length)
-    assertEquals(0, getColumnAtIndex(s1.values, 81).length)
+    assertEquals(9, getColumnAtIndex(s1.variables, 80).length)
+    assertEquals(0, getColumnAtIndex(s1.variables, 81).length)
     assertEquals(
-      row[ValueSudoku](s1.values,1).apply(5),
-      getColumnAtIndex[ValueSudoku](s1.values, 5).head
+      row[ValueSudoku](s1.variables,1).apply(5),
+      getColumnAtIndex[ValueSudoku](s1.variables, 5).head
     )
     assertEquals(
-      row[ValueSudoku](s1.values, 9).apply(8),
-      getColumnAtIndex(s1.values, 80).apply(8)
+      row[ValueSudoku](s1.variables, 9).apply(8),
+      getColumnAtIndex(s1.variables, 80).apply(8)
     )
 
   }
 
   @Test private[tools] def rowTest() = {
-    assertEquals(0, row(s1.values, 0).length)
-    assertEquals(0, row(s1.values, 10).length)
-    assertEquals(9, row(s1.values, 1).length)
-    assertEquals(Option(1), row[Option[Int]](s1.values, 1).head)
-    assertEquals(Option(9), row(s1.values, 1).apply(8))
-    assertEquals(Option(40), row(s1.values, 5).apply(3))
-    assertEquals(Option(73), row(s1.values, 9).apply(0))
-    assertEquals(Option(81), row(s1.values, 9).apply(8))
+    assertEquals(0, row(s1.variables, 0).length)
+    assertEquals(0, row(s1.variables, 10).length)
+    assertEquals(9, row(s1.variables, 1).length)
+    assertEquals(Option(1), row[Option[Int]](s1.variables, 1).head)
+    assertEquals(Option(9), row(s1.variables, 1).apply(8))
+    assertEquals(Option(40), row(s1.variables, 5).apply(3))
+    assertEquals(Option(73), row(s1.variables, 9).apply(0))
+    assertEquals(Option(81), row(s1.variables, 9).apply(8))
   }
 
   @Test private[tools] def getBoxTest() = {
-    val firstBox = getBox(s1.values, 0)
+    val firstBox = getBox(s1.variables, 0)
     assertEquals(9, firstBox.length)
     assertEquals(1, firstBox(0).get)
     assertEquals(2, firstBox(1).get)
@@ -68,7 +71,7 @@ class sudokuToolsTest {
     assertEquals(19, firstBox(6).get)
     assertEquals(21, firstBox(8).get)
 
-    val fourthBox = getBox(s1.values,41)
+    val fourthBox = getBox(s1.variables,41)
     assertEquals(9, fourthBox.length)
     assertEquals(31, fourthBox(0).get)
     assertEquals(32, fourthBox(1).get)
@@ -76,7 +79,7 @@ class sudokuToolsTest {
     assertEquals(40, fourthBox(3).get)
     assertEquals(49, fourthBox(6).get)
     assertEquals(51, fourthBox(8).get)
-    val fifthBox = getBox(s1.values, 44)
+    val fifthBox = getBox(s1.variables, 44)
     assertEquals(9, fifthBox.length)
     assertEquals(34, fifthBox(0).get)
     assertEquals(35, fifthBox(1).get)
@@ -87,10 +90,10 @@ class sudokuToolsTest {
   }
 
   @Test private[tools] def getRowAtIndexTest() = {
-    assertEquals(9, getRowAtIndex(s1.values, 80).length)
-    assertEquals(row(s1.values, 1).apply(0), getRowAtIndex(s1.values,5).apply(0))
-    assertEquals(row(s1.values, 9).apply(8), getRowAtIndex(s1.values, 80).apply(8))
-    assertEquals(0, getRowAtIndex(s1.values, 81).length)
+    assertEquals(9, getRowAtIndex(s1.variables, 80).length)
+    assertEquals(row(s1.variables, 1).apply(0), getRowAtIndex(s1.variables,5).apply(0))
+    assertEquals(row(s1.variables, 9).apply(8), getRowAtIndex(s1.variables, 80).apply(8))
+    assertEquals(0, getRowAtIndex(s1.variables, 81).length)
   }
 
   @Test private[tools] def getColumnNumberTest() = {
@@ -110,15 +113,15 @@ class sudokuToolsTest {
   }
 
   @Test private[tools] def columnTest() = {
-    assertEquals(0, column(s1.values,0).length)
-    assertEquals(0, column(s1.values,10).length)
-    assertEquals(9, column(s1.values,1).length)
-    assertEquals(9, column(s1.values,9).length)
-    assertEquals(9, column(s1.values,5).length)
-    assertEquals(Option(1), column(s1.values,1).apply(0))
-    assertEquals(Option(73), column(s1.values,1).apply(8))
-    assertEquals(Option(32), column(s1.values,5).apply(3))
-    assertEquals(Option(9), column(s1.values,9).apply(0))
-    assertEquals(Option(81), column(s1.values,9).apply(8))
+    assertEquals(0, column(s1.variables,0).length)
+    assertEquals(0, column(s1.variables,10).length)
+    assertEquals(9, column(s1.variables,1).length)
+    assertEquals(9, column(s1.variables,9).length)
+    assertEquals(9, column(s1.variables,5).length)
+    assertEquals(Option(1), column(s1.variables,1).apply(0))
+    assertEquals(Option(73), column(s1.variables,1).apply(8))
+    assertEquals(Option(32), column(s1.variables,5).apply(3))
+    assertEquals(Option(9), column(s1.variables,9).apply(0))
+    assertEquals(Option(81), column(s1.variables,9).apply(8))
   }
 }

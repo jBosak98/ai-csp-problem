@@ -1,60 +1,64 @@
 package tools
 
-import model.CSPProblem
-import model.types.Domain
-import sudokuTools._
+import model.{CSP, CSPProblem}
+import tools.sudokuTools._
+
+import scala.reflect.ClassTag
 
 object calculateDomain {
-  def calculateDomain(sudoku: CSPProblem): CSPProblem = {
+  def calculateDomain[T:ClassTag](sudoku: CSPProblem[T]): CSPProblem[T] = {
 
-    def filterDefinedValues: Int => Boolean = { index => sudoku.values(index).isEmpty && !sudoku.isConstant(index) }
+    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty && !sudoku.isConstant(index) }
 
     def getDomainForEach: Int => Any = { index =>
       sudoku.domains(index) =
-        if(filterDefinedValues(index)) List[Int]()
-        else calculateDomainOfIndex(sudoku, index)
+        if(filterDefinedValues(index)) List[T]()
+        else sudoku.constraint(sudoku, index)
     }
 
     sudoku
-      .values
+      .variables
       .indices
       .foreach(getDomainForEach)
 
     sudoku
   }
 
-  def calculateDomainOfIndex(sudoku: CSPProblem, index: Int): Domain = {
-    val row = getRowAtIndex(sudoku.values, index)
-    val column = getColumnAtIndex(sudoku.values, index)
-    val box = getBox(sudoku.values, index)
+  def calculateDomainOfIndex[T:ClassTag](sudoku: CSP[T], index: Int): List[T] = {
+    val row = getRowAtIndex(sudoku.variables, index)
+    val column = getColumnAtIndex(sudoku.variables, index)
+    val box = getBox(sudoku.variables, index)
     val domainComplement = (row ++ column ++ box).filter(_.isDefined).map(_.get).distinct
-    val domain = (1 to 9).toList.filter(e => !domainComplement.contains(e))
+    val domain =
+      sudoku
+        .availableValues
+        .filter(e => !domainComplement.contains(e))
     domain
   }
 
-  def calculateDomainOfRelatedFields(sudoku: CSPProblem, index:Int) = {
-    val indexes = sudoku.values.indices.toArray
+  def calculateDomainOfRelatedFields[T:ClassTag](sudoku: CSPProblem[T], index:Int) = {
+    val indexes = sudoku.variables.indices.toArray
     val rowIndices = getRowAtIndex(indexes, index)
     val columnIndices = getColumnAtIndex(indexes, index)
     val boxIndices = getBox(indexes, index)
 
     val valuesToCalculate = (rowIndices ++ columnIndices ++ boxIndices).distinct
     valuesToCalculate.foreach(index => {
-      sudoku.domains(index) = calculateDomainOfIndex(sudoku, index)
+      sudoku.domains(index) = sudoku.constraint(sudoku, index)
     })
   }
 
 
-  def isDomainProper(sudoku: CSPProblem): Boolean = {
+  def isDomainProper[T:ClassTag](sudoku: CSPProblem[T]): Boolean = {
 
-    def filterDefinedValues: Int => Boolean = { index => sudoku.values(index).isEmpty }
+    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty }
 
     def mapIsAnyDomainEmpty: Int => Boolean = { index =>
-      calculateDomainOfIndex(sudoku, index).isEmpty
+      sudoku.constraint(sudoku, index).isEmpty
     }
 
     !sudoku
-      .values
+      .variables
       .indices
       .filter(filterDefinedValues)
       .map(mapIsAnyDomainEmpty)

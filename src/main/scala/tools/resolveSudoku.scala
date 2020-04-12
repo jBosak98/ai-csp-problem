@@ -1,11 +1,12 @@
 package tools
 
 import model.CSPProblem
-import tools.calculateDomain.calculateDomainOfIndex
+
+import scala.reflect.ClassTag
 
 class SudokuResolver(val tools:CSPTools) extends resolveCSP {
 
-  def resolveProblem(problem:  CSPProblem): Boolean = {
+  def resolveProblem[T:ClassTag](problem:  CSPProblem[T]): Boolean = {
     val position = getNextIndexToResolve(problem)
     if (position.isDefined) {
       resolveField(problem, position.get)
@@ -16,11 +17,12 @@ class SudokuResolver(val tools:CSPTools) extends resolveCSP {
     isSolved
   }
 
-  def resolveField(sudoku: CSPProblem, index: Int): Boolean = {
-    val domain = calculateDomainOfIndex(sudoku, index)
+  def resolveField[T:ClassTag](sudoku: CSPProblem[T], index: Int): Boolean = {
+    val domain = sudoku.constraint(sudoku, index)
 
-    def isValueProper: Int => Boolean = { value =>
-      sudoku.values(index) = Option(value)
+
+    def isValueProper: T => Boolean = { value =>
+      sudoku.variables(index) = Option(value)
       calculateDomain.calculateDomainOfRelatedFields(sudoku, index)
       if (!calculateDomain.isDomainProper(sudoku)) {
         false
@@ -37,24 +39,24 @@ class SudokuResolver(val tools:CSPTools) extends resolveCSP {
 
     }
 
-    sudoku.values(index) = domain.find(isValueProper)
+    sudoku.variables(index) = domain.find(isValueProper)
     true
   }
 
-  def getNextIndexToResolve(problem: CSPProblem): Option[Int] = {
+  def getNextIndexToResolve[T:ClassTag](problem: CSPProblem[T]): Option[Int] = {
 
     def getOnlyEmptyValues: Int => Boolean = {
-      index => !problem.isConstant(index) && problem.values(index).isEmpty
+      index => !problem.isConstant(index) && problem.variables(index).isEmpty
     }
 
     val filteredIndexes: List[Int] = problem
-      .values
+      .variables
       .indices
       .filter(getOnlyEmptyValues).toList
     if (filteredIndexes.isEmpty) return Option.empty[Int]
 
     val indexToResolve = filteredIndexes.reduce((acc: Int, e: Int) => {
-      problem.domains(e) = calculateDomainOfIndex(problem, e)
+      problem.domains(e) = problem.constraint(problem, e)
       if (problem.domains(acc).length > problem.domains(e).length)
         e
       else
@@ -62,6 +64,5 @@ class SudokuResolver(val tools:CSPTools) extends resolveCSP {
     })
     Option(indexToResolve)
   }
-
 }
 
