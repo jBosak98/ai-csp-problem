@@ -5,7 +5,7 @@ import model.CSPProblem
 import scala.reflect.ClassTag
 
 object lowestDomainSizeHeuristic {
-  def getNextIndexToResolve[T:ClassTag](problem: CSPProblem[T]): Option[Int] = {
+  def getNextIndexToResolve[T:ClassTag,V](problem: CSPProblem[T,V]): Option[Int] = {
 
     def getOnlyEmptyValues: Int => Boolean = {
       index => !problem.isConstant(index) && problem.variables(index).isEmpty

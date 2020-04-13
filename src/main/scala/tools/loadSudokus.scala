@@ -19,14 +19,14 @@ object loadSudokus {
 
   }
 
-  private def _loadSudoku(line: String): CSP[Int] = {
+  private def _loadSudoku(line: String): CSP[Int,Int] = {
     val values = line.split(';')(2)
     val loadedSudoku = for {sudokuNumber <- values
                             singleValue = _toInt(sudokuNumber)
                             } yield (singleValue, singleValue.isDefined)
     val (sudokuValues, isConstant) = loadedSudoku.toArray.unzip
     val domains = Array.fill[Domain](sudokuValues.length)(List[Int]())
-    CSP[Int](
+    CSP[Int,Int](
       variables = sudokuValues,
       domains = domains,
       isConstant = isConstant,

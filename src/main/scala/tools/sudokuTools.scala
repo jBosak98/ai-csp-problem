@@ -9,15 +9,15 @@ object sudokuTools extends CSPTools {
   index scope = {0, ..., 80}
  */
 
-  def isProperlyResolved[T](sudoku: CSPProblem[T]): Boolean = {
+  def isProperlyResolved[T,V](sudoku: CSPProblem[T,V]): Boolean = {
     areAllFieldsFilled(sudoku) && isProperlyFilled(sudoku)
   }
 
-  def areAllFieldsFilled[T](sudoku: CSPProblem[T]): Boolean = {
+  def areAllFieldsFilled[T,V](sudoku: CSPProblem[T,V]): Boolean = {
     !sudoku.variables.exists(_.isEmpty)
   }
 
-  def isProperlyFilled[T](sudoku: CSPProblem[T]): Boolean = {
+  def isProperlyFilled[T,V](sudoku: CSPProblem[T,V]): Boolean = {
 
     def isValueProperlyFilled: Int => Boolean = { index =>
       val valueSudoku = sudoku.variables(index)
@@ -55,6 +55,16 @@ object sudokuTools extends CSPTools {
   def getColumnNumber(index: Int): Option[Int] =
     if (!_isProperIndex(index)) None
     else Option((index % 9) + 1)
+
+  def getIndicesOfRow(rowNumber:Int, size:(Int, Int)): Array[Int] = {
+    val indices = (0 until size._1 * size._2).toArray
+    row(indices, size, rowNumber)
+  }
+
+  def getIndicesOfColumn(columnNumber:Int, size:(Int, Int)): Array[Int] = {
+    val indices = (0 until size._1 * size._2).toArray
+    column(indices, size, columnNumber)
+  }
 
   def getRowAtIndex[T: ClassTag](values: Array[T],size:(Int,Int), index: Int): Array[T] =
     row[T](values,size, (index / size._1) + 1)

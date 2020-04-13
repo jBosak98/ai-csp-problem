@@ -6,13 +6,13 @@ import tools.sudokuTools._
 import scala.reflect.ClassTag
 
 object domainSudoku {
-  def calculateDomain[T:ClassTag](sudoku: CSPProblem[T]): CSPProblem[T] = {
+  def calculateDomain[T:ClassTag,V](sudoku: CSPProblem[T,V]): CSPProblem[T,V] = {
 
     def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty && !sudoku.isConstant(index) }
 
     def getDomainForEach: Int => Any = { index =>
       sudoku.domains(index) =
-        if(filterDefinedValues(index)) List[T]()
+        if(filterDefinedValues(index)) List[V]()
         else sudoku.constraint(sudoku, index)
     }
 
@@ -24,7 +24,7 @@ object domainSudoku {
     sudoku
   }
 
-  def calculateDomainOfIndex[T:ClassTag](sudoku: CSPModel[T], index: Int): List[T] = {
+  def calculateDomainOfIndex(sudoku: CSPModel[Int,Int], index: Int): List[Int] = {
     val row = getRowAtIndex(sudoku.variables, sudoku.size, index)
     val column = getColumnAtIndex(sudoku.variables, sudoku.size, index)
     val box = getBox(sudoku.variables, sudoku.size, index)
@@ -36,7 +36,7 @@ object domainSudoku {
     domain
   }
 
-  def calculateDomainOfRelatedFields[T:ClassTag](sudoku: CSPProblem[T], index:Int) = {
+  def calculateDomainOfRelatedFields[T:ClassTag,V](sudoku: CSPProblem[T,V], index:Int) = {
     val indexes = sudoku.variables.indices.toArray
     val rowIndices = getRowAtIndex(indexes, sudoku.size, index)
     val columnIndices = getColumnAtIndex(indexes, sudoku.size, index)
@@ -49,7 +49,7 @@ object domainSudoku {
   }
 
 
-  def isDomainProper[T:ClassTag](sudoku: CSPProblem[T]): Boolean = {
+  def isDomainProper[T:ClassTag,V](sudoku: CSPProblem[T,V]): Boolean = {
 
     def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty }
 

@@ -1,6 +1,6 @@
 package tools
 
-import model.{CSPModel, CSPProblem}
+import model.{CSPModel, CSPProblem, QuizVariable}
 
 import scala.reflect.runtime.universe._
 
@@ -8,14 +8,14 @@ import scala.reflect.runtime.universe._
 object printProblem {
 
 
-  def printProblem[T:TypeTag](problem: CSPModel[T]) =
+  def printProblem[T:TypeTag,V](problem: CSPModel[T,V]) =
     typeOf[T].toString match {
       case "Int" => _printSudoku(problem)
-      case "String" => _printPuzzle(problem)
+      case "String" => _printPuzzle(problem.asInstanceOf[CSPModel[String,QuizVariable]])
     }
 
 
-  private def _printPuzzle[String](problem: CSPModel[String] with CSPModel[String]) = {
+  private def _printPuzzle(problem: CSPModel[String,QuizVariable] with CSPModel[String,QuizVariable]) = {
       val (column, row) = problem.size
 
     (0 until row).foreach { rowNumber =>
@@ -29,7 +29,7 @@ object printProblem {
 
 
 
-  private def _printSudoku[T](problem: CSPModel[T]) = {
+  private def _printSudoku[T,V](problem: CSPModel[T,V]) = {
     val (column, row) = problem.size
     (0 until column)
       .foreach(rowNumber => {

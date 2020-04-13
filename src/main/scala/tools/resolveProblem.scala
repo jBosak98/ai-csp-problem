@@ -7,12 +7,12 @@ import scala.reflect.ClassTag
 object resolveProblem {
 
 
-  def resolveProblem[T: ClassTag]
-  (indexSelectionHeuristic: CSPProblem[T] => Option[Int])
-  (problem: CSPProblem[T], tools: CSPTools): Boolean = {
+  def resolveProblem[T: ClassTag,V]
+  (indexSelectionHeuristic: CSPProblem[T,V] => Option[Int])
+  (problem: CSPProblem[T,V], tools: CSPTools): Boolean = {
     val position = indexSelectionHeuristic(problem)
 
-    val resolveField = resolveFieldGenerator[T](indexSelectionHeuristic)(tools)
+    val resolveField = resolveFieldGenerator[T,V](indexSelectionHeuristic)(tools)
     if (position.isDefined) {
       resolveField(problem, position.get)
     }
@@ -22,14 +22,14 @@ object resolveProblem {
     isSolved
   }
 
-  def resolveFieldGenerator[T: ClassTag]
-  (getNextIndex: CSPProblem[T] => Option[Int])
-  (tools: CSPTools): (CSPProblem[T], Int) => Boolean = {
+  def resolveFieldGenerator[T: ClassTag,V]
+  (getNextIndex: CSPProblem[T,V] => Option[Int])
+  (tools: CSPTools): (CSPProblem[T,V], Int) => Boolean = {
 
-    def resolveField(problem: CSPProblem[T], index: Int): Boolean = {
+    def resolveField(problem: CSPProblem[T,V], index: Int): Boolean = {
       val domain = problem.constraint(problem, index)
 
-      def isValueProper: T => Boolean = { value =>
+      def isValueProper: V => Boolean = { value =>
         problem.variables(index) = Option(value)
         domainSudoku.calculateDomainOfRelatedFields(problem, index)
         if (!domainSudoku.isDomainProper(problem)) {
