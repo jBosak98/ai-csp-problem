@@ -31,8 +31,8 @@ object resolveProblem {
 
       def isValueProper: T => Boolean = { value =>
         problem.variables(index) = Option(value)
-        calculateDomain.calculateDomainOfRelatedFields(problem, index)
-        if (!calculateDomain.isDomainProper(problem)) {
+        domainSudoku.calculateDomainOfRelatedFields(problem, index)
+        if (!domainSudoku.isDomainProper(problem)) {
           false
         } else {
           val indexToResolve = getNextIndex(problem)

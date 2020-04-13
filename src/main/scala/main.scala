@@ -1,6 +1,6 @@
-import heuristics.lowestDomainSizeHeuristic._
-import model.CSPProblem
+import model.{CSP, CSPModel, CSPProblem}
 import tools._
+
 object main {
 
   def main(args: Array[String]): Unit = {
@@ -8,22 +8,30 @@ object main {
     val sudokus = loadSudokus.loadSudokus(filename)
 
     var time = 0L
-    val heuristic = getNextIndexToResolve[Int] _
-    val resolver = resolveProblem.resolveProblem[Int](heuristic) _
-    sudokus.foreach(s => {
-      calculateDomain.calculateDomain(s)
-//      time += timer({
-      resolver(s,sudokuTools)
-//      })
-      printSudoku.printSudoku(s)
-    })
-//    println(s"time sum:${time}")
-//    val puzzleFile = "src/main/resources/ai-lab2-2020-dane/Jolka/puzzle0"
-//    val wordsFile = "src/main/resources/ai-lab2-2020-dane/Jolka/words0"
-//    val jolka = loadJolkas.loadJolka(
-//      puzzleFile = puzzleFile,
-//      wordsFile = wordsFile
-//    )
+//    val heuristic = getNextIndexToResolve[Int] _
+//    val resolver = resolveProblem.resolveProblem[Int](heuristic) _
+    val constraint:(CSPModel[Int], Int) => List[Int] = domainSudoku.calculateDomainOfIndex
+//    sudokus.foreach(s => {
+//      val problem:CSPProblem[Int] = CSPProblem[Int](s, constraint)
+//      calculateDomain.calculateDomain(problem)
+////      time += timer({
+//      resolver(problem,sudokuTools)
+////      })
+//      printProblem.printProblem(problem)
+//    })
+    println(s"time sum:${time}")
+    val puzzleFile = "src/main/resources/ai-lab2-2020-dane/Jolka/puzzle0"
+    val wordsFile = "src/main/resources/ai-lab2-2020-dane/Jolka/words0"
+    val jolka:CSP[String] = loadJolkas.loadJolka(
+      puzzleFile = puzzleFile,
+      wordsFile = wordsFile
+    )
+    val quizCSP = CSPProblem[String](jolka, {(_:CSPModel[String],_:Int)=>Nil})
+
+
+    domainPuzzle.calculateDomainOfIndex(quizCSP, 0)
+    printProblem.printProblem(sudokus.head)
+    printProblem.printProblem(quizCSP)
   }
 
 

@@ -1,20 +1,21 @@
 package tools
 
-import model.CSPProblem
-import reflect.runtime.universe._
+import model.{CSPModel, CSPProblem}
+
+import scala.reflect.runtime.universe._
 
 
 object printProblem {
 
 
-  def printProblem[T:TypeTag](problem: CSPProblem[T]) =
+  def printProblem[T:TypeTag](problem: CSPModel[T]) =
     typeOf[T].toString match {
       case "Int" => _printSudoku(problem)
       case "String" => _printPuzzle(problem)
     }
 
 
-  private def _printPuzzle[String](problem: CSPProblem[String] with CSPProblem[String]) = {
+  private def _printPuzzle[String](problem: CSPModel[String] with CSPModel[String]) = {
       val (column, row) = problem.size
 
     (0 until row).foreach { rowNumber =>
@@ -28,7 +29,7 @@ object printProblem {
 
 
 
-  private def _printSudoku[T](problem: CSPProblem[T]) = {
+  private def _printSudoku[T](problem: CSPModel[T]) = {
     val (column, row) = problem.size
     (0 until column)
       .foreach(rowNumber => {
