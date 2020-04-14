@@ -29,7 +29,7 @@ object loadSudokus {
       variables = sudokuValues,
       domains = domains,
       isConstant = isConstant,
-      size = (9,9),
+      size = (9, 9),
       availableValues = List.range(1, 10).map(_.toString)
     )
   }

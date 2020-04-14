@@ -1,20 +1,20 @@
 package model
 
 
-case class CSPProblem[T, V](
+case class CSPProblem[V](
                           variables: Array[Option[V]],
-                          domains: Array[List[T]],
+                          domains: Array[List[String]],
                           isConstant: Array[Boolean],
                           size: (Int, Int),
-                          constraint: (CSPModel[T,V], Int) => List[T],
-                          availableValues: List[T]
-                        ) extends CSPModel[T,V]
+                          constraint: (CSPModel[V], Int) => List[String],
+                          availableValues: List[String]
+                        ) extends CSPModel[V]
 
 
 object CSPProblem {
 
-  def apply[T,V](csp:CSPModel[T,V], constraint:(CSPModel[T,V], Int) => List[T]):CSPProblem[T,V] =
-    CSPProblem[T,V](
+  def apply[V](csp:CSPModel[V], constraint:(CSPModel[V], Int) => List[String]):CSPProblem[V] =
+    CSPProblem[V](
       csp.variables,
       csp.domains,
       csp.isConstant,

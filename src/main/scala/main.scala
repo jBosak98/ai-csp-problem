@@ -1,5 +1,9 @@
-import model.{CSP, CSPModel, CSPProblem, QuizVariable}
+import heuristics.lowestDomainSizeHeuristic
+import model._
 import tools._
+import tools.domainPuzzle._
+import tools.getQuizValidator.{createQuizVariable, getQuizValidator}
+import tools.loadQuiz.loadQuiz
 
 object main {
 
@@ -22,42 +26,34 @@ object main {
 //      printProblem.printProblem(problem)
 //    })
 //    println(s"time sum:${time}")
-    val puzzleFile = "src/main/resources/ai-lab2-2020-dane/Jolka/puzzle1"
-    val wordsFile = "src/main/resources/ai-lab2-2020-dane/Jolka/words1"
-    val jolka:CSP[String, QuizVariable] = loadJolkas.loadJolka(
-      puzzleFile = puzzleFile,
-      wordsFile = wordsFile
-    )
+    val quizNumber = 1
+    val puzzleFile = s"src/main/resources/ai-lab2-2020-dane/Jolka/puzzle${quizNumber}"
+    val wordsFile = s"src/main/resources/ai-lab2-2020-dane/Jolka/words${quizNumber}"
+    val jolka:CSP[QuizVariable] = loadQuiz(puzzleFile, wordsFile)
+
+
     val domainCalculator = domainPuzzle.calculateDomainOfVariableIndex[QuizVariable] _
-    val quizCSP = CSPProblem[String, QuizVariable](jolka, domainCalculator)
-//    println(quizCSP.variables.toList)
+    val quizCSP = CSPProblem[QuizVariable](jolka, domainCalculator)
 
-//    quizCSP.variables.indices.foreach { i =>
-//      domainPuzzle.calculateDomainOfVariableIndex(quizCSP, i)
-//    }
-//
-//    def createVariable = { (variable:QuizVariable, word:String) =>
-//      Option(QuizVariable(
-//        index = variable.index,
-//        value = Option(word),
-//        isVertical = variable.isVertical,
-//        size = variable.size
-//      ))
-//
-//    }
-//    val heuristicFilterPuzzle:((Option[QuizVariable], Int)) => Boolean = {
-//      case (variable:Option[QuizVariable], index:Int) => variable.get.value.isEmpty
-//    }
-//
-//    val heuristic = lowestDomainSizeHeuristic.getNextIndexToResolve[String,QuizVariable](heuristicFilterPuzzle) _
-//    val resolver = resolveProblem.resolveProblem[String,QuizVariable](heuristic, createVariable) _
-//
-//    resolver(quizCSP, sudokuTools)
+    calculateDomainForEachVariables(quizCSP)
 
-//    printProblem.printProblem(sudokus.head)
-    quizCSP.variables.toList.foreach(println)
+    val heuristicFilterPuzzle:((Option[QuizVariable], Int)) => Boolean = {
+      case (variable:Option[QuizVariable], index:Int) => variable.get.value.isEmpty
+    }
+
+    val quizValidator = getQuizValidator()
+    val createVariable = createQuizVariable
+    val heuristic = lowestDomainSizeHeuristic.getNextIndexToResolve[QuizVariable](heuristicFilterPuzzle) _
+    val resolver = resolveProblem.resolveProblem[QuizVariable](heuristic, createVariable) _
+    resolver(quizCSP, quizValidator)
+
     printProblem.printProblem(quizCSP)
   }
+
+
+
+
+
 
 
 }

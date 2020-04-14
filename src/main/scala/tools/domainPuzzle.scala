@@ -15,16 +15,23 @@ object domainPuzzle {
   }
 
 
+  def calculateDomainForEachVariables[V <: QuizVariable](problem: CSPModel[V]) = {
+    problem.variables.indices.foreach { i =>
+      domainPuzzle.calculateDomainOfVariableIndex(problem, i)
+    }
+
+  }
+
   def getVariablesThatConflictWithIndexes(
-                                           problem:CSPModel[QuizVariable],
-                                           indexes:List[Int],
-                                           getVertical:Option[Boolean]):List[QuizVariable] =
+                                           problem: CSPModel[QuizVariable],
+                                           indexes: List[Int],
+                                           getVertical: Option[Boolean]): List[QuizVariable] =
     indexes.flatMap { index =>
       getVariablesThatConflictWithIndex(problem, index, getVertical)
     }.distinct
 
 
-  def getVariablesThatConflictWithIndex(problem:CSPModel[QuizVariable], index:Int, getVertical:Option[Boolean]) = {
+  def getVariablesThatConflictWithIndex(problem: CSPModel[QuizVariable], index: Int, getVertical: Option[Boolean]) = {
     val indices = if (getVertical.isEmpty) {
       val indicesOfColumn = getIndicesOfColumn(getColumnNumber(index, problem.size).get, problem.size)
       val indicesOfRow = getIndicesOfRow(getRowNumber(index, problem.size).get, problem.size)
@@ -38,57 +45,53 @@ object domainPuzzle {
       getIndicesThatAreFilledByVariable(problem, variable).exists(i => indices.contains(i))
     }
   }
-  def calculateDomainForVariable(problem:CSPModel[QuizVariable], variable: QuizVariable) = {
+
+  def calculateDomainForVariable(problem: CSPModel[QuizVariable], variable: QuizVariable) = {
     val availableValues = problem.availableValues.filter(_.length == variable.size)
     val filledIndices = getIndicesThatAreFilledByVariable(problem, variable)
     val variablesToCheck = getVariablesThatConflictWithIndexes(problem, filledIndices, Option(!variable.isVertical))
-//    println("filledIndices", filledIndices)
-//    println("availableValues", availableValues)
     defineAvailableValues(problem, filledIndices, availableValues, variablesToCheck)
   }
 
-//  boat
-//  ___#
-//  ____
 
   def defineAvailableValues(
-         problem: CSPModel[QuizVariable],
-         filledIndicesByVariable:List[Int],
-         availableValues:List[String],
-         variablesToCheck:List[QuizVariable]
-       ):List[String] =
+                             problem: CSPModel[QuizVariable],
+                             filledIndicesByVariable: List[Int],
+                             availableValues: List[String],
+                             variablesToCheck: List[QuizVariable]
+                           ): List[String] =
     availableValues.map { availableValue =>
       val IsWordProperForVariable = !filledIndicesByVariable
         .indices
         .zip(availableValue)
-        .exists {case (filledIndice: Int, char: Char) =>
-        variablesToCheck.exists { variableToCheck =>
-          val valueInCheckedVariable = valueOfVariableAtIndex(problem,variableToCheck,filledIndicesByVariable(filledIndice))
-//          println(variableToCheck, valueInCheckedVariable, char, filledIndicesByVariable(filledIndice))
-         valueInCheckedVariable.isDefined && valueInCheckedVariable.get != char
+        .exists { case (filledIndice: Int, char: Char) =>
+          variablesToCheck.exists { variableToCheck =>
+            val valueInCheckedVariable = valueOfVariableAtIndex(problem, variableToCheck, filledIndicesByVariable(filledIndice))
+            valueInCheckedVariable.isDefined && valueInCheckedVariable.get != char
+          }
         }
-      }
-//      println(availableValue, IsWordProperForVariable)
-      if(IsWordProperForVariable) Option(availableValue) else Option.empty[String]
+
+      if (IsWordProperForVariable) Option(availableValue) else Option.empty[String]
     }.filter(_.isDefined).map(_.get)
 
 
-  def valueOfVariableAtIndex(problem:CSPModel[QuizVariable], variable: QuizVariable, index:Int) = {
+  def valueOfVariableAtIndex(problem: CSPModel[QuizVariable], variable: QuizVariable, index: Int) = {
     val indicesOfVariable = getIndicesThatAreFilledByVariable(problem, variable)
     val indexInsideVariable = indicesOfVariable.indexOf(index)
-//    println(indexInsideVariable, variable, variable.value.)
-    if(indexInsideVariable == -1 || variable.value.getOrElse("") == "") Option.empty[Char]
+
+    if (indexInsideVariable == -1 || variable.value.getOrElse("") == "") Option.empty[Char]
     else Option(variable.value.get.charAt(indexInsideVariable))
 
   }
-  def getWholeLineIndicesThatAreFilledByVariable(problem:CSPModel[QuizVariable], variable: QuizVariable) =
-    if(variable.isVertical)
+
+  def getWholeLineIndicesThatAreFilledByVariable(problem: CSPModel[QuizVariable], variable: QuizVariable) =
+    if (variable.isVertical)
       getIndicesOfColumn(getColumnNumber(variable.index, problem.size).get, problem.size)
     else
       getIndicesOfRow(getRowNumber(variable.index, problem.size).get, problem.size)
 
 
-  def getIndicesThatAreFilledByVariable(problem:CSPModel[QuizVariable], variable: QuizVariable) = {
+  def getIndicesThatAreFilledByVariable(problem: CSPModel[QuizVariable], variable: QuizVariable) = {
     val longLine = getWholeLineIndicesThatAreFilledByVariable(problem, variable)
     val indexInLongLine = longLine.indexOf(variable.index)
     longLine.slice(indexInLongLine, indexInLongLine + variable.size).toList

@@ -2,13 +2,11 @@ package heuristics
 
 import model.CSPProblem
 
-import scala.reflect.ClassTag
-
 object lowestDomainSizeHeuristic {
 
-  def getNextIndexToResolve[T:ClassTag,V]
+  def getNextIndexToResolve[V]
   (filterFun:((Option[V], Int)) => Boolean)
-  (problem: CSPProblem[T,V])
+  (problem: CSPProblem[V])
   : Option[Int] = {
 
     val filteredIndexes = problem

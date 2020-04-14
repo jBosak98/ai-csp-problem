@@ -3,5 +3,6 @@ package model
 object types {
   type ValueSudoku = Option[Int]
   type Domain = List[Int]
-//  type QuizVariable = (In)
+  type Validator[V] = CSPProblem[V] => Boolean
+  //  type QuizVariable = (In)
 }

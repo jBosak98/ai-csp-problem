@@ -1,17 +1,17 @@
 package model
 
-case class CSP[T, V](variables: Array[Option[V]],
-                  domains: Array[List[T]],
+case class CSP[V](variables: Array[Option[V]],
+                  domains: Array[List[String]],
                   isConstant: Array[Boolean],
-                  availableValues:List[T],
+                  availableValues:List[String],
                   size: (Int, Int)
-) extends CSPModel[T, V]
+) extends CSPModel[V]
 
-trait CSPModel[T, V]{
+trait CSPModel[V]{
     val variables: Array[Option[V]]
-    val domains: Array[List[T]]
+    val domains: Array[List[String]]
     val isConstant: Array[Boolean]
-    val availableValues:List[T]
+    val availableValues:List[String]
     val size: (Int, Int)
 
 }

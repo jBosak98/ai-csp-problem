@@ -7,15 +7,15 @@ import org.junit.jupiter.api.{BeforeEach, Test}
 import tools.sudokuTools._
 
 class sudokuToolsTest {
-      var s1: CSPProblem[Int,Int] = _
+      var s1: CSPProblem[Int] = _
   @BeforeEach private[tools] def setUp() = {
             s1 = CSPProblem(
               variables = (1 to 81).map(a => Option(a)).toArray,
-              domains = Array.empty[List[Int]],
+              domains = Array.empty[List[String]],
               isConstant = Array.fill(80)(false),
               size = (9,9),
-              constraint = {(_,_) => Nil},
-              availableValues = List.range(1, 10)
+              constraint = {(_,_) => List.empty[String]},
+              availableValues = List.range(1, 10).map(_.toString)
             )
   }
 

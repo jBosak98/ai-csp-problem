@@ -8,7 +8,7 @@ import scala.reflect.runtime.universe._
 object printProblem {
 
 
-  def printProblem[V:TypeTag](problem: CSPModel[V]) =
+  def printProblem[V: TypeTag](problem: CSPModel[V]) =
     typeOf[V].toString match {
       case "Int" => _printSudoku(problem)
       case "model.QuizVariable" => _printPuzzle(problem.asInstanceOf[CSPModel[QuizVariable]])
@@ -16,7 +16,7 @@ object printProblem {
 
 
   private def _printPuzzle(problem: CSPModel[QuizVariable] with CSPModel[QuizVariable]) = {
-      val (column, row) = problem.size
+    val (column, row) = problem.size
     val puzzle = buildPuzzle.buildPuzzle(problem)
 
     (0 until row).foreach { rowNumber =>
