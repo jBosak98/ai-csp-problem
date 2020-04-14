@@ -69,6 +69,6 @@ object loadJolkas {
       isVertical = isVertical,
       size = word.length
     )
-    createQuizVariable(quizVariables :+ variable, words.drop(1), indices.drop(word.length), isVertical)
+    createQuizVariable(quizVariables :+ variable, words.drop(1), indices.drop(word.length + 1), isVertical)
   }
 }
