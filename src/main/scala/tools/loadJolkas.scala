@@ -5,7 +5,7 @@ import model.{CSP, CSPProblem, QuizVariable}
 import scala.io.Source.fromFile
 
 object loadJolkas {
-  def loadJolka(puzzleFile:String, wordsFile:String):CSP[String, QuizVariable] = {
+  def loadJolka(puzzleFile:String, wordsFile:String):CSP[QuizVariable] = {
     val bufferedSource = fromFile(puzzleFile)("UTF-8")
     val lines = bufferedSource.getLines().toList
     bufferedSource.close()
@@ -20,7 +20,8 @@ object loadJolkas {
     val size = (lines.head.length,lines.size)
 
     val variables = createVariables(puzzle, size).map(Option(_))
-    CSP[String, QuizVariable](
+//    variables.foreach(println)
+    CSP[QuizVariable](
       variables = variables,
       domains = Array.fill(variables.length)(List.empty[String]),
       isConstant = puzzle.map(_.equals("#")),
@@ -40,14 +41,15 @@ object loadJolkas {
     val (numberOfColumn, numberOfRows) = size
 
 
-    val verticalWords= (1 to numberOfColumn).flatMap { columnNumber =>
+    val verticalWords = (1 to numberOfColumn).flatMap { columnNumber =>
       val indices = sudokuTools.getIndicesOfColumn(columnNumber, size)
-      val words = sudokuTools.column(puzzle, size, columnNumber).map(_.getOrElse("_")).mkString("").split("#")
+      val words = sudokuTools.column(puzzle, size, columnNumber).map(_.getOrElse("_")).mkString("").replace("#","#!#").split("#")
+//      println(words.toList)
       createQuizVariable(Array.empty[QuizVariable], words, indices, isVertical = true)
     }
     val horizontalWords: IndexedSeq[QuizVariable] = (1 to numberOfRows) flatMap { rowNumber =>
       val indices = sudokuTools.getIndicesOfRow(rowNumber, size)
-      val words = sudokuTools.row(puzzle, size, rowNumber).map(_.getOrElse("_")).mkString("").split("#")
+      val words = sudokuTools.row(puzzle, size, rowNumber).map(_.getOrElse("_")).mkString("").replace("#","#!#").split("#")
       createQuizVariable(Array.empty[QuizVariable], words, indices, isVertical = false)
     }
 
@@ -60,8 +62,10 @@ object loadJolkas {
                           indices:Array[Int],
                           isVertical:Boolean
                         ):Array[QuizVariable] = {
+//    println(indices.toList, words.toList)
     if(words.isEmpty) return quizVariables
     val word = words.head
+    if(word == "") return createQuizVariable(quizVariables, words.drop(1), indices, isVertical)
     if(word.length < 2) return createQuizVariable(quizVariables, words.drop(1), indices.drop(1), isVertical)
     val variable = QuizVariable(
       index = indices(0),
@@ -69,6 +73,6 @@ object loadJolkas {
       isVertical = isVertical,
       size = word.length
     )
-    createQuizVariable(quizVariables :+ variable, words.drop(1), indices.drop(word.length + 1), isVertical)
+    createQuizVariable(quizVariables :+ variable, words.drop(1), indices.drop(word.length), isVertical)
   }
 }

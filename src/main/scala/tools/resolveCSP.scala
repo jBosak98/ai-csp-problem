@@ -2,11 +2,9 @@ package tools
 
 import model.CSPProblem
 
-import scala.reflect.ClassTag
-
 
 trait resolveCSP {
-  def resolveProblem[T:ClassTag,V](problem: CSPProblem[T,V]):Boolean
+  def resolveProblem[V](problem: CSPProblem[V]):Boolean
 
-  def getNextIndexToResolve[T:ClassTag,V](problem: CSPProblem[T,V]): Option[Int]
+  def getNextIndexToResolve[V](problem: CSPProblem[V]): Option[Int]
 }

@@ -3,21 +3,21 @@ package tools
 import model.CSPProblem
 import scala.reflect.ClassTag
 
-object sudokuTools extends CSPTools {
+object sudokuTools {
   /*rowNumber scope = {1, ..., 9}
   columnNumber scope = {1, ..., 9}
   index scope = {0, ..., 80}
  */
 
-  def isProperlyResolved[T,V](sudoku: CSPProblem[T,V]): Boolean = {
+  def isProperlyResolved[V](sudoku: CSPProblem[V]): Boolean = {
     areAllFieldsFilled(sudoku) && isProperlyFilled(sudoku)
   }
 
-  def areAllFieldsFilled[T,V](sudoku: CSPProblem[T,V]): Boolean = {
+  def areAllFieldsFilled[V](sudoku: CSPProblem[V]): Boolean = {
     !sudoku.variables.exists(_.isEmpty)
   }
 
-  def isProperlyFilled[T,V](sudoku: CSPProblem[T,V]): Boolean = {
+  def isProperlyFilled[V](sudoku: CSPProblem[V]): Boolean = {
 
     def isValueProperlyFilled: Int => Boolean = { index =>
       val valueSudoku = sudoku.variables(index)
@@ -50,7 +50,8 @@ object sudokuTools extends CSPTools {
     if (!_isProperIndex(index)) None
     else Option((index / size._1) + 1)
 
-  private def _isProperIndex(index: Int): Boolean = index >= 0 && index < 81
+  private def _isProperIndex(index: Int): Boolean = true
+//    index >= 0 && index < 81
 
   def getColumnNumber(index: Int, size:(Int, Int)): Option[Int] =
     if (!_isProperIndex(index)) None
