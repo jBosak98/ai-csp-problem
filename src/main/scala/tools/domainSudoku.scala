@@ -6,13 +6,13 @@ import tools.sudokuTools._
 import scala.reflect.ClassTag
 
 object domainSudoku {
-  def calculateDomain[T:ClassTag,V](sudoku: CSPProblem[T,V]): CSPProblem[T,V] = {
+  def calculateDomain[T:ClassTag,V](sudoku: CSPProblem[Int,Int]): CSPProblem[Int,Int] = {
 
     def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty && !sudoku.isConstant(index) }
 
     def getDomainForEach: Int => Any = { index =>
       sudoku.domains(index) =
-        if(filterDefinedValues(index)) List[V]()
+        if(filterDefinedValues(index)) List[Int]()
         else sudoku.constraint(sudoku, index)
     }
 

@@ -19,15 +19,22 @@ object loadJolkas {
     }).toArray
     val size = (lines.head.length,lines.size)
 
-
+    val variables = createVariables(puzzle, size).map(Option(_))
     CSP[String, QuizVariable](
-      variables = createVariables(puzzle, size).map(Option(_)),
-      domains = Array.empty[List[QuizVariable]],
+      variables = variables,
+      domains = Array.fill(variables.length)(List.empty[String]),
       isConstant = puzzle.map(_.equals("#")),
-      availableValues = Nil,
+      availableValues = loadAvailableValues(wordsFile),
       size = size
     )
     }
+
+  def loadAvailableValues(wordsFile:String) = {
+    val bufferedSource = fromFile(wordsFile)("UTF-8")
+    val lines = bufferedSource.getLines().toList
+    bufferedSource.close()
+    lines
+  }
 
   def createVariables(puzzle:Array[Option[String]], size:(Int,Int)):Array[QuizVariable] = {
     val (numberOfColumn, numberOfRows) = size
@@ -59,7 +66,7 @@ object loadJolkas {
     val variable = QuizVariable(
       index = indices(0),
       value = Option.empty[String],
-      isVertical = true,
+      isVertical = isVertical,
       size = word.length
     )
     createQuizVariable(quizVariables :+ variable, words.drop(1), indices.drop(word.length), isVertical)

@@ -5,16 +5,16 @@ import model.CSPProblem
 import scala.reflect.ClassTag
 
 object lowestDomainSizeHeuristic {
-  def getNextIndexToResolve[T:ClassTag,V](problem: CSPProblem[T,V]): Option[Int] = {
 
-    def getOnlyEmptyValues: Int => Boolean = {
-      index => !problem.isConstant(index) && problem.variables(index).isEmpty
-    }
+  def getNextIndexToResolve[T:ClassTag,V]
+  (filterFun:((Option[V], Int)) => Boolean)
+  (problem: CSPProblem[T,V])
+  : Option[Int] = {
 
-    val filteredIndexes: List[Int] = problem
-      .variables
-      .indices
-      .filter(getOnlyEmptyValues).toList
+    val filteredIndexes = problem
+      .variables.zipWithIndex
+      .filter(filterFun)
+      .map(_._2)
     if (filteredIndexes.isEmpty) return Option.empty[Int]
 
     val indexToResolve = filteredIndexes.reduce((acc: Int, e: Int) => {
@@ -24,6 +24,7 @@ object lowestDomainSizeHeuristic {
       else
         acc
     })
+
     Option(indexToResolve)
   }
 }

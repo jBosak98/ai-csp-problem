@@ -7,7 +7,7 @@ import org.junit.jupiter.api.{BeforeEach, Test}
 import tools.sudokuTools._
 
 class sudokuToolsTest {
-      var s1: CSPProblem[Int] = _
+      var s1: CSPProblem[Int,Int] = _
   @BeforeEach private[tools] def setUp() = {
             s1 = CSPProblem(
               variables = (1 to 81).map(a => Option(a)).toArray,
@@ -98,18 +98,18 @@ class sudokuToolsTest {
 
   @Test private[tools] def getColumnNumberTest() = {
 
-    assertEquals(9, getColumnNumber(44).get)
-    assertEquals(1, getColumnNumber(0).get)
-    assertEquals(2, getColumnNumber(1).get)
-    assertEquals(3, getColumnNumber(2).get)
-    assertEquals(4, getColumnNumber(3).get)
-    assertEquals(5, getColumnNumber(4).get)
-    assertEquals(6, getColumnNumber(5).get)
-    assertEquals(7, getColumnNumber(6).get)
-    assertEquals(8, getColumnNumber(7).get)
-    assertEquals(9, getColumnNumber(8).get)
-    assertEquals(1, getColumnNumber(9).get)
-    assertEquals(2, getColumnNumber(10).get)
+    assertEquals(9, getColumnNumber(44,s1.size).get)
+    assertEquals(1, getColumnNumber(0,s1.size).get)
+    assertEquals(2, getColumnNumber(1,s1.size).get)
+    assertEquals(3, getColumnNumber(2,s1.size).get)
+    assertEquals(4, getColumnNumber(3,s1.size).get)
+    assertEquals(5, getColumnNumber(4,s1.size).get)
+    assertEquals(6, getColumnNumber(5,s1.size).get)
+    assertEquals(7, getColumnNumber(6,s1.size).get)
+    assertEquals(8, getColumnNumber(7,s1.size).get)
+    assertEquals(9, getColumnNumber(8,s1.size).get)
+    assertEquals(1, getColumnNumber(9,s1.size).get)
+    assertEquals(2, getColumnNumber(10,s1.size).get)
   }
 
   @Test private[tools] def columnTest() = {

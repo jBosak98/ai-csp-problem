@@ -36,8 +36,8 @@ object sudokuTools extends CSPTools {
   def getBox[T: ClassTag](values: Array[T], size:(Int,Int), index: Int): Array[T] = {
     if (!_isProperIndex(index)) Array.empty[T]
 
-    val rowOfFirstElement = ((getRowNumber(index).get - 1) / 3) * 3 + 1
-    val columnOfFirstElement = ((getColumnNumber(index).get - 1) / 3) * 3 + 1
+    val rowOfFirstElement = ((getRowNumber(index,size).get - 1) / 3) * 3 + 1
+    val columnOfFirstElement = ((getColumnNumber(index,size).get - 1) / 3) * 3 + 1
     val box = for {boxColumn <- 0 to 2
                    rowNumber = rowOfFirstElement + boxColumn
                    boxRow = row[T](values, size, rowNumber)
@@ -46,15 +46,15 @@ object sudokuTools extends CSPTools {
     box.flatten.toArray
   }
 
-  def getRowNumber(index: Int): Option[Int] =
+  def getRowNumber(index: Int, size:(Int,Int)): Option[Int] =
     if (!_isProperIndex(index)) None
-    else Option((index / 9) + 1)
+    else Option((index / size._1) + 1)
 
   private def _isProperIndex(index: Int): Boolean = index >= 0 && index < 81
 
-  def getColumnNumber(index: Int): Option[Int] =
+  def getColumnNumber(index: Int, size:(Int, Int)): Option[Int] =
     if (!_isProperIndex(index)) None
-    else Option((index % 9) + 1)
+    else Option((index % size._1) + 1)
 
   def getIndicesOfRow(rowNumber:Int, size:(Int, Int)): Array[Int] = {
     val indices = (0 until size._1 * size._2).toArray
