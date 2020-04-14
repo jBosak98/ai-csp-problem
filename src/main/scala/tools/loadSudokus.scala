@@ -1,7 +1,7 @@
 package tools
 
-import model.Sudoku
-import model.types.Domain
+
+import model.{CSP, CSPProblem}
 
 import scala.io.Source.fromFile
 
@@ -18,14 +18,20 @@ object loadSudokus {
 
   }
 
-  private def _loadSudoku(line: String): Sudoku = {
+  private def _loadSudoku(line: String): CSP[Int] = {
     val values = line.split(';')(2)
     val loadedSudoku = for {sudokuNumber <- values
                             singleValue = _toInt(sudokuNumber)
                             } yield (singleValue, singleValue.isDefined)
     val (sudokuValues, isConstant) = loadedSudoku.toArray.unzip
-    val domains = Array.fill[Domain](sudokuValues.length)(List[Int]())
-    Sudoku(sudokuValues, domains,isConstant)
+    val domains = Array.fill[List[String]](sudokuValues.length)(List[String]())
+    CSP[Int](
+      variables = sudokuValues,
+      domains = domains,
+      isConstant = isConstant,
+      size = (9, 9),
+      availableValues = List.range(1, 10).map(_.toString)
+    )
   }
 
   private def _toInt(i: Char): Option[Int] = i match {

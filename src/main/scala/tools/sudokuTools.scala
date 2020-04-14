@@ -1,6 +1,6 @@
 package tools
 
-import model.Sudoku
+import model.CSPProblem
 import scala.reflect.ClassTag
 
 object sudokuTools {
@@ -9,71 +9,86 @@ object sudokuTools {
   index scope = {0, ..., 80}
  */
 
-  def isSudokuProperlyResolved(sudoku: Sudoku): Boolean = {
-    areAllFieldsFilled(sudoku) && isSudokuProperlyFilled(sudoku)
+  def isProperlyResolved[V](sudoku: CSPProblem[V]): Boolean = {
+    areAllFieldsFilled(sudoku) && isProperlyFilled(sudoku)
   }
 
-  def areAllFieldsFilled(sudoku: Sudoku): Boolean = {
-    !sudoku.values.exists(_.isEmpty)
+  def areAllFieldsFilled[V](sudoku: CSPProblem[V]): Boolean = {
+    !sudoku.variables.exists(_.isEmpty)
   }
 
-  def isSudokuProperlyFilled(sudoku: Sudoku): Boolean = {
+  def isProperlyFilled[V](sudoku: CSPProblem[V]): Boolean = {
 
     def isValueProperlyFilled: Int => Boolean = { index =>
-      val valueSudoku = sudoku.values(index)
-      val row = getRowAtIndex(sudoku.values, index).filter(_.eq(valueSudoku))
-      val column = getColumnAtIndex(sudoku.values, index).filter(_.eq(valueSudoku))
-      val box = getBox(sudoku.values, index).filter(_.eq(valueSudoku))
+      val valueSudoku = sudoku.variables(index)
+      val row = getRowAtIndex(sudoku.variables, sudoku.size, index).filter(_.eq(valueSudoku))
+      val column = getColumnAtIndex(sudoku.variables, sudoku.size, index).filter(_.eq(valueSudoku))
+      val box = getBox(sudoku.variables, sudoku.size, index).filter(_.eq(valueSudoku))
       !(row.length == 1 && column.length == 1 && box.length == 1)
     }
 
     !sudoku
-      .values
+      .variables
       .indices
       .exists(isValueProperlyFilled)
   }
 
-  def getBox[T: ClassTag](values: Array[T], index: Int): Array[T] = {
+  def getBox[T: ClassTag](values: Array[T], size: (Int, Int), index: Int): Array[T] = {
     if (!_isProperIndex(index)) Array.empty[T]
 
-    val rowOfFirstElement = ((getRowNumber(index).get - 1) / 3) * 3 + 1
-    val columnOfFirstElement = ((getColumnNumber(index).get - 1) / 3) * 3 + 1
+    val rowOfFirstElement = ((getRowNumber(index, size).get - 1) / 3) * 3 + 1
+    val columnOfFirstElement = ((getColumnNumber(index, size).get - 1) / 3) * 3 + 1
     val box = for {boxColumn <- 0 to 2
                    rowNumber = rowOfFirstElement + boxColumn
-                   boxRow = row[T](values, rowNumber)
+                   boxRow = row[T](values, size, rowNumber)
                      .slice(columnOfFirstElement - 1, columnOfFirstElement + 2)
                    } yield boxRow
     box.flatten.toArray
   }
 
-  def getRowNumber(index: Int): Option[Int] =
+  def getRowNumber(index: Int, size: (Int, Int)): Option[Int] =
     if (!_isProperIndex(index)) None
-    else Option((index / 9) + 1)
+    else Option((index / size._1) + 1)
 
-  private def _isProperIndex(index: Int): Boolean = index >= 0 && index < 81
-
-  def getColumnNumber(index: Int): Option[Int] =
+  def getColumnNumber(index: Int, size: (Int, Int)): Option[Int] =
     if (!_isProperIndex(index)) None
-    else Option((index % 9) + 1)
+    else Option((index % size._1) + 1)
 
-  def getRowAtIndex[T: ClassTag](values: Array[T], index: Int): Array[T] =
-    row[T](values, (index / 9) + 1)
+
+
+  def getRowAtIndex[T: ClassTag](values: Array[T], size: (Int, Int), index: Int): Array[T] =
+    row[T](values, size, (index / size._1) + 1)
+
+  def getColumnAtIndex[T: ClassTag](values: Array[T], size: (Int, Int), index: Int): Array[T] =
+    if (!_isProperIndex(index)) Array.empty[T]
+    else column(values, size, (index % size._2) + 1)
+
+  private def _isProperIndex(index: Int): Boolean = true //worked only for sudoku 9x9 :(
+  //    index >= 0 && index < 81
+
+  def column[T: ClassTag](values: Array[T], size: (Int, Int), columnNumber: Int): Array[T] =
+    if (columnNumber < 1 || columnNumber > size._1) Array.empty[T]
+    else values.indices.collect { case i
+      if i % size._1 == columnNumber - 1 => values(i)
+    }.toArray
 
   //  def getFromSudoku[T:ClassTag](values: Array[T], rowNumber: Int, columnNumber: Int): Option[T] =
   //    if (columnNumber < 1 || columnNumber > 9 || rowNumber < 1 || rowNumber > 9) Option.empty[T]
   //    else row[T](values, rowNumber)(columnNumber - 1)
 
-  def row[T: ClassTag](values: Array[T], rowNumber: Int): Array[T] =
-    if (rowNumber < 1 || rowNumber > 9) Array.empty[T]
-    else values.slice((rowNumber - 1) * 9, (rowNumber - 1) * 9 + 9)
+  def getIndicesOfRow(rowNumber: Int, size: (Int, Int)): Array[Int] = {
+    val indices = (0 until size._1 * size._2).toArray
+    row(indices, size, rowNumber)
+  }
 
-  def getColumnAtIndex[T: ClassTag](values: Array[T], index: Int): Array[T] =
-    if (!_isProperIndex(index)) Array.empty[T]
-    else column(values, (index % 9) + 1)
+  def row[T: ClassTag](values: Array[T], size: (Int, Int), rowNumber: Int): Array[T] =
+    if (rowNumber < 1 || rowNumber > size._2) Array.empty[T]
+    else values.slice((rowNumber - 1) * size._1, (rowNumber - 1) * size._1 + size._1)
 
-  def column[T: ClassTag](values: Array[T], columnNumber: Int): Array[T] =
-    if (columnNumber < 1 || columnNumber > 9) Array.empty[T]
-    else values.indices.collect { case i
-      if i % 9 == columnNumber - 1 => values(i)
-    }.toArray
+  def getIndicesOfColumn(columnNumber: Int, size: (Int, Int)): Array[Int] = {
+    val indices = (0 until size._1 * size._2).toArray
+    column(indices, size, columnNumber)
+  }
+
+
 }
