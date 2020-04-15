@@ -1,6 +1,7 @@
-package tools
+package problemCreators
 
 import model.{CSP, QuizVariable}
+import tools.sudokuTools
 
 import scala.io.Source.fromFile
 

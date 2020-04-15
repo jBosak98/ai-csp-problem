@@ -1,7 +1,7 @@
-package tools
+package problemCreators
 
+import domainCalculations.domainPuzzle.getIndicesThatAreFilledByVariable
 import model.{CSP, QuizVariable}
-import tools.domainPuzzle.getIndicesThatAreFilledByVariable
 
 object buildPuzzle {
   def buildPuzzle(problem: CSP[QuizVariable]): Array[Option[Char]] = {

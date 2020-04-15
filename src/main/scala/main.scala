@@ -1,7 +1,10 @@
+import domainCalculations.{domainPuzzle, domainSudoku}
 import heuristics.lowestDomainSizeHeuristic
 import model._
+import problemCreators.{loadQuiz, loadSudokus, printProblem}
 import tools._
-import tools.QuizValidations.{areAllFieldsFilled, isProperlyFilled, isProperlyResolved}
+import validators.quizValidations.{areAllFieldsFilled, isProperlyFilled, isProperlyResolved}
+import validators.sudokuValidations
 
 object main {
 
@@ -48,9 +51,9 @@ object main {
 
 
     val sudokuValidator = CSPProblemValidator[Int](
-      sudokuTools.isProperlyResolved,
-      sudokuTools.areAllFieldsFilled,
-      sudokuTools.isProperlyFilled
+      sudokuValidations.isProperlyResolved,
+      sudokuValidations.areAllFieldsFilled,
+      sudokuValidations.isProperlyFilled
     )
     val quizValidator = CSPProblemValidator[QuizVariable](
       isProperlyResolved,

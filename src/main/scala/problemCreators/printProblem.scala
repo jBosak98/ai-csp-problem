@@ -1,9 +1,8 @@
-package tools
+package problemCreators
+
 
 import model.{CSP, QuizVariable}
-
 import scala.reflect.runtime.universe._
-
 
 object printProblem {
 

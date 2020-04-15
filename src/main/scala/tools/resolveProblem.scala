@@ -1,5 +1,7 @@
 package tools
 
+import domainCalculations.domainSudoku
+
 import scala.reflect.runtime.universe._
 import model.{CSP, CSPProblemValidator, DomainCalculator, QuizVariable}
 

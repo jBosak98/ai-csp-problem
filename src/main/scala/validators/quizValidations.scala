@@ -1,8 +1,10 @@
-package tools
+package validators
 
-import model.{CSP, CSPProblemValidator, QuizVariable}
+import model.{CSP, QuizVariable}
+import problemCreators.buildPuzzle
+import tools.sudokuTools
 
-object QuizValidations {
+object quizValidations {
 
   def isProperlyFilled(problem: CSP[QuizVariable]) = {
     val (numberOfColumn, numberOfRows) = problem.size

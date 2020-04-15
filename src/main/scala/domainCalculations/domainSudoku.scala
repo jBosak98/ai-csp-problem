@@ -1,7 +1,7 @@
-package tools
+package domainCalculations
 
-import model.{CSP, QuizVariable}
-import tools.sudokuTools._
+import model.CSP
+import tools.sudokuTools.{getBox, getColumnAtIndex, getRowAtIndex}
 
 import scala.reflect.ClassTag
 

@@ -1,7 +1,6 @@
-package tools
+package problemCreators
 
-
-import model.{CSP}
+import model.CSP
 
 import scala.io.Source.fromFile
 

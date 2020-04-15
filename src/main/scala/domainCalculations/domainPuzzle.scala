@@ -1,7 +1,7 @@
-package tools
+package domainCalculations
 
 import model.{CSP, QuizVariable}
-import tools.sudokuTools._
+import tools.sudokuTools.{getColumnNumber, getIndicesOfColumn, getIndicesOfRow, getRowNumber}
 
 object domainPuzzle {
 
