@@ -33,7 +33,7 @@ object domainSudoku {
       sudoku
         .availableValues
         .filter(e => !domainComplement.map(_.toString).contains(e))
-    domain
+    domain.map(_.toString)
   }
 
   def calculateDomainOfRelatedFields[V](sudoku: CSPProblem[V], index: Int) = {

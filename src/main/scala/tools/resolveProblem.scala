@@ -1,12 +1,13 @@
 package tools
 
+import scala.reflect.runtime.universe._
 import model.{CSPProblem, CSPProblemValidator, QuizVariable}
 
 object resolveProblem {
 
 
-  def resolveProblem[V]
-  (indexSelectionHeuristic: CSPProblem[V] => Option[Int], createVariable: (V, Option[String]) => Option[V])
+  def resolveProblem[V:TypeTag]
+  (indexSelectionHeuristic: CSPProblem[V] => Option[Int], createVariable: (Option[V], Option[String]) => Option[V])
   (problem: CSPProblem[V], validatorCSP: CSPProblemValidator[V]): Boolean = {
     val position = indexSelectionHeuristic(problem)
     val resolveField = resolveFieldGenerator[V](indexSelectionHeuristic, createVariable)(validatorCSP)
@@ -18,17 +19,17 @@ object resolveProblem {
     isSolved
   }
 
-  def resolveFieldGenerator[V]
-  (getNextIndex: CSPProblem[V] => Option[Int], createVariable: (V, Option[String]) => Option[V])
+  def resolveFieldGenerator[V:TypeTag]
+  (getNextIndex: CSPProblem[V] => Option[Int], createVariable: (Option[V], Option[String]) => Option[V])
   (validatorCSP: CSPProblemValidator[V]): (CSPProblem[V], Int) => Boolean = {
 
     def resolveField(problem: CSPProblem[V], index: Int): Boolean = {
 
       val domain = problem.constraint(problem, index)
-      printProblem.printProblem[QuizVariable](problem.asInstanceOf[CSPProblem[QuizVariable]])
+//      printProblem.printProblem[V](problem.asInstanceOf[CSPProblem[V]])
 
       def isValueProper: String => Boolean = { value =>
-        problem.variables(index) = createVariable(problem.variables(index).get, Option(value))
+        problem.variables(index) = createVariable(problem.variables(index), Option(value))
         //        problem.domains.indices.map { index => //domainSudoku.calculateDomainOfRelatedFields(problem, index)
         //          problem.domains(index) = problem.constraint(problem,index)
         //        }.toArray
@@ -37,8 +38,6 @@ object resolveProblem {
         //        } else {
         val indexToResolve = getNextIndex(problem)
         if (indexToResolve.isEmpty) {
-          problem.variables.foreach(println)
-          println("indexToResolve.isEmpty")
           true
         } else {
           resolveField(problem, indexToResolve.get)
@@ -49,11 +48,9 @@ object resolveProblem {
 
       }
 
-      val x = domain.find(isValueProper)
-
       problem.variables(index) = createVariable(
-        problem.variables(index).get,
-        x
+        problem.variables(index),
+        domain.find(isValueProper)
       )
       true
     }

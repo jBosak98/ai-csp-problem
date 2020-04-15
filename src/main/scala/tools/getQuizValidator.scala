@@ -40,13 +40,5 @@ object getQuizValidator {
     )
   }
 
-  def createQuizVariable = { (variable: QuizVariable, word: Option[String]) =>
-    Option(QuizVariable(
-      index = variable.index,
-      value = word,
-      isVertical = variable.isVertical,
-      size = variable.size
-    ))
 
-  }
 }
