@@ -1,30 +1,30 @@
 package tools
 
-import model.{CSP, CSPModel, CSPProblem}
+import model.{CSP, CSPModel, CSPProblem, QuizVariable}
 import tools.sudokuTools._
 
 import scala.reflect.ClassTag
 
 object domainSudoku {
-  def calculateDomain[T: ClassTag, V](sudoku: CSPProblem[Int]): CSPProblem[Int] = {
+//  def calculateDomain[T: ClassTag, V](sudoku: CSP[Int]): CSP[Int] = {
+//
+//    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty && !sudoku.isConstant(index) }
+//
+//    def getDomainForEach: Int => Any = { index =>
+//      sudoku.domains(index) =
+//        if (filterDefinedValues(index)) List[String]()
+//        else sudoku.constraint(sudoku, index)
+//    }
+//
+//    sudoku
+//      .variables
+//      .indices
+//      .foreach(getDomainForEach)
+//
+//    sudoku
+//  }
 
-    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty && !sudoku.isConstant(index) }
-
-    def getDomainForEach: Int => Any = { index =>
-      sudoku.domains(index) =
-        if (filterDefinedValues(index)) List[String]()
-        else sudoku.constraint(sudoku, index)
-    }
-
-    sudoku
-      .variables
-      .indices
-      .foreach(getDomainForEach)
-
-    sudoku
-  }
-
-  def calculateDomainOfIndex(sudoku: CSPModel[Int], index: Int): List[String] = {
+  def calculateDomainOfIndex[V <: Int:ClassTag](sudoku: CSP[V], index: Int): List[String] = {
     val row = getRowAtIndex(sudoku.variables, sudoku.size, index)
     val column = getColumnAtIndex(sudoku.variables, sudoku.size, index)
     val box = getBox(sudoku.variables, sudoku.size, index)
@@ -36,7 +36,7 @@ object domainSudoku {
     domain.map(_.toString)
   }
 
-  def calculateDomainOfRelatedFields[V](sudoku: CSPProblem[V], index: Int) = {
+  def calculateDomainOfRelatedFields[V <: Int:ClassTag](sudoku: CSP[V], index: Int) = {
     val indexes = sudoku.variables.indices.toArray
     val rowIndices = getRowAtIndex(indexes, sudoku.size, index)
     val columnIndices = getColumnAtIndex(indexes, sudoku.size, index)
@@ -44,24 +44,24 @@ object domainSudoku {
 
     val valuesToCalculate = (rowIndices ++ columnIndices ++ boxIndices).distinct
     valuesToCalculate.foreach(index => {
-      sudoku.domains(index) = sudoku.constraint(sudoku, index)
+      sudoku.domains(index) = calculateDomainOfIndex[V](sudoku, index)
     })
+    sudoku.domains(index)
   }
 
 
-  def isDomainProper[V](sudoku: CSPProblem[V]): Boolean = {
+  def isDomainProper[V](sudoku: CSP[V]): Boolean = {
 
-    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty }
+    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isDefined }
 
-    def mapIsAnyDomainEmpty: Int => Boolean = { index =>
-      sudoku.constraint(sudoku, index).isEmpty
+    def mapIsAnyDomainEmpty: Int => Boolean = { index =>false
+
     }
 
     !sudoku
       .variables
       .indices
       .filter(filterDefinedValues)
-      .map(mapIsAnyDomainEmpty)
-      .exists(_.equals(true))
+      .exists(mapIsAnyDomainEmpty)
   }
 }

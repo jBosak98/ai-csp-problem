@@ -1,20 +1,19 @@
 package tools
 
-import model.CSPProblem
+import model.{CSP, CSPProblem}
 import model.types.ValueSudoku
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.{BeforeEach, Test}
 import tools.sudokuTools._
 
 class sudokuToolsTest {
-      var s1: CSPProblem[Int] = _
+      var s1: CSP[Int] = _
   @BeforeEach private[tools] def setUp() = {
-            s1 = CSPProblem(
+            s1 = CSP(
               variables = (1 to 81).map(a => Option(a)).toArray,
               domains = Array.empty[List[String]],
               isConstant = Array.fill(80)(false),
               size = (9,9),
-              constraint = {(_,_) => List.empty[String]},
               availableValues = List.range(1, 10).map(_.toString)
             )
   }

@@ -1,6 +1,7 @@
 package tools
 
-import model.CSPProblem
+import model.{CSP, CSPProblem}
+
 import scala.reflect.ClassTag
 
 object sudokuTools {
@@ -9,15 +10,15 @@ object sudokuTools {
   index scope = {0, ..., 80}
  */
 
-  def isProperlyResolved[V](sudoku: CSPProblem[V]): Boolean = {
+  def isProperlyResolved[V](sudoku: CSP[V]): Boolean = {
     areAllFieldsFilled(sudoku) && isProperlyFilled(sudoku)
   }
 
-  def areAllFieldsFilled[V](sudoku: CSPProblem[V]): Boolean = {
+  def areAllFieldsFilled[V](sudoku: CSP[V]): Boolean = {
     !sudoku.variables.exists(_.isEmpty)
   }
 
-  def isProperlyFilled[V](sudoku: CSPProblem[V]): Boolean = {
+  def isProperlyFilled[V](sudoku: CSP[V]): Boolean = {
 
     def isValueProperlyFilled: Int => Boolean = { index =>
       val valueSudoku = sudoku.variables(index)

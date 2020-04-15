@@ -1,49 +1,58 @@
 package tools
 
 import scala.reflect.runtime.universe._
-import model.{CSPProblem, CSPProblemValidator, QuizVariable}
+import model.{CSP, CSPProblem, CSPProblemValidator, DomainCalculator, QuizVariable}
 
 object resolveProblem {
 
+  var steps = 0
 
-  def resolveProblem[V:TypeTag]
-  (indexSelectionHeuristic: CSPProblem[V] => Option[Int], createVariable: (Option[V], Option[String]) => Option[V])
-  (problem: CSPProblem[V], validatorCSP: CSPProblemValidator[V]): Boolean = {
+  def resolveProblem[V: TypeTag]
+  (
+    indexSelectionHeuristic: CSP[V] => Option[Int],
+    createVariable: (Option[V], Option[String]) => Option[V],
+    domainCalculator: DomainCalculator[V]
+  )
+  (problem: CSP[V], validatorCSP: CSPProblemValidator[V]): Boolean = {
     val position = indexSelectionHeuristic(problem)
-    val resolveField = resolveFieldGenerator[V](indexSelectionHeuristic, createVariable)(validatorCSP)
+    val resolveField = resolveFieldGenerator[V](indexSelectionHeuristic, createVariable, domainCalculator)(validatorCSP)
     if (position.isDefined) {
       resolveField(problem, position.get)
     }
+    println(s"steps: ${steps}")
     val isSolved = validatorCSP.isProperlyResolved(problem)
     if (!isSolved) println("Problem has no solution")
     isSolved
   }
 
-  def resolveFieldGenerator[V:TypeTag]
-  (getNextIndex: CSPProblem[V] => Option[Int], createVariable: (Option[V], Option[String]) => Option[V])
-  (validatorCSP: CSPProblemValidator[V]): (CSPProblem[V], Int) => Boolean = {
+  def resolveFieldGenerator[V: TypeTag]
+  (getNextIndex: CSP[V] => Option[Int],
+   createVariable: (Option[V], Option[String]) => Option[V],
+   domainCalculator: DomainCalculator[V]
+  )
+  (validatorCSP: CSPProblemValidator[V]): (CSP[V], Int) => Boolean = {
 
-    def resolveField(problem: CSPProblem[V], index: Int): Boolean = {
+    def resolveField(problem: CSP[V], index: Int): Boolean = {
 
-      val domain = problem.constraint(problem, index)
-//      printProblem.printProblem[V](problem.asInstanceOf[CSPProblem[V]])
+      val domain = domainCalculator.calculateDomainOfIndex(problem, index)
+      //      printProblem.printProblem[V](problem.asInstanceOf[CSPProblem[V]])
 
       def isValueProper: String => Boolean = { value =>
         problem.variables(index) = createVariable(problem.variables(index), Option(value))
-        //        problem.domains.indices.map { index => //domainSudoku.calculateDomainOfRelatedFields(problem, index)
-        //          problem.domains(index) = problem.constraint(problem,index)
-        //        }.toArray
-        //        if (!domainSudoku.isDomainProper(problem)) {
-        //          false
-        //        } else {
-        val indexToResolve = getNextIndex(problem)
-        if (indexToResolve.isEmpty) {
-          true
+        domainCalculator.calculateDomainOfDependents(problem, index)
+        steps = steps + 1
+
+        if (!domainSudoku.isDomainProper(problem)) {
+          false
         } else {
-          resolveField(problem, indexToResolve.get)
-          validatorCSP.isProperlyFilled(problem)
+          val indexToResolve = getNextIndex(problem)
+          if (indexToResolve.isEmpty) {
+            true
+          } else {
+            resolveField(problem, indexToResolve.get)
+            validatorCSP.isProperlyFilled(problem)
+          }
         }
-        //        }
 
 
       }

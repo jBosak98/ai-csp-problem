@@ -1,11 +1,14 @@
 package tools
 
-import model.{CSPModel, QuizVariable}
+import model.{CSP, CSPModel, QuizVariable}
 import tools.domainPuzzle.getIndicesThatAreFilledByVariable
 
 object buildPuzzle {
-  def buildPuzzle(problem: CSPModel[QuizVariable]): Array[Option[Char]] = {
-    val puzzle = Array.fill(problem.size._1 * problem.size._2)(Option.empty[Char])
+  def buildPuzzle(problem: CSP[QuizVariable]): Array[Option[Char]] = {
+    var puzzle = Array.fill(problem.size._1 * problem.size._2)(Option('-'))
+    problem.isConstant.zipWithIndex.filter(_._1).foreach {case (_:Boolean, index:Int) =>
+      puzzle(index) = Option.empty[Char]
+    }
     val variables = problem.variables.map(_.get)
     _buildPuzzle(
       problem,
@@ -14,7 +17,7 @@ object buildPuzzle {
     )
   }
 
-  private def _buildPuzzle(problem: CSPModel[QuizVariable],
+  private def _buildPuzzle(problem: CSP[QuizVariable],
                            puzzle: Array[Option[Char]],
                            variables: Array[QuizVariable]
                           ): Array[Option[Char]] = {
@@ -23,9 +26,8 @@ object buildPuzzle {
       val variable = variables.head
       val variableIndices = getIndicesThatAreFilledByVariable(problem, variable)
       variableIndices.indices.foreach { i =>
-        val variableElse = (0 to i).map(_ => "_").mkString("")
-        val variableValue = variable.value.getOrElse(variableElse)
-        puzzle(variableIndices(i)) = if (variableValue.length > i) Option(variableValue(i)) else Option('-')
+        val variableValue = variable.value.getOrElse("@")
+        puzzle(variableIndices(i)) = if(variableValue != "@") Option(variableValue(i)) else puzzle(variableIndices(i))
       }
       _buildPuzzle(problem, puzzle, variables.drop(1))
     }

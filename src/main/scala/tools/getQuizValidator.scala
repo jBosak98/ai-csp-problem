@@ -1,10 +1,10 @@
 package tools
 
-import model.{CSPProblem, CSPProblemValidator, QuizVariable}
+import model.{CSP, CSPProblem, CSPProblemValidator, QuizVariable}
 
 object getQuizValidator {
 
-  def isProperlyFilled(problem: CSPProblem[QuizVariable]) = {
+  def isProperlyFilled(problem: CSP[QuizVariable]) = {
     val (numberOfColumn, numberOfRows) = problem.size
     val puzzle = buildPuzzle.buildPuzzle(problem)
     val columnLines: String = (1 to numberOfColumn).map { columnNumber =>
@@ -18,7 +18,7 @@ object getQuizValidator {
     isFilled
   }
 
-  def areAllFieldsFilled(problem: CSPProblem[QuizVariable]) = {
+  def areAllFieldsFilled(problem: CSP[QuizVariable]) = {
     val arePuzzleFilled = buildPuzzle.buildPuzzle(problem).exists { char =>
       char.isEmpty || !(char.get.isLetter && char.get.equals("#"))
     }
@@ -29,7 +29,7 @@ object getQuizValidator {
 
   def getQuizValidator() = {
 
-    def isProperlyResolved(problem: CSPProblem[QuizVariable]) = {
+    def isProperlyResolved(problem: CSP[QuizVariable]) = {
       areAllFieldsFilled(problem) && isProperlyFilled(problem)
     }
 

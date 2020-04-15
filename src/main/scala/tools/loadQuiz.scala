@@ -22,7 +22,7 @@ object loadQuiz {
     CSP[QuizVariable](
       variables = variables,
       domains = Array.fill(variables.length)(List.empty[String]),
-      isConstant = puzzle.map(_.equals("#")),
+      isConstant = puzzle.map(_.isDefined),
       availableValues = loadAvailableValues(wordsFile),
       size = size
     )

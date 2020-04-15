@@ -1,12 +1,12 @@
 package heuristics
 
-import model.CSPProblem
+import model.{CSP, CSPProblem}
 
 object lowestDomainSizeHeuristic {
 
   def getNextIndexToResolve[V]
   (filterFun:((Option[V], Int)) => Boolean)
-  (problem: CSPProblem[V])
+  (problem: CSP[V])
   : Option[Int] = {
 
     val filteredIndexes = problem
@@ -16,7 +16,6 @@ object lowestDomainSizeHeuristic {
     if (filteredIndexes.isEmpty) return Option.empty[Int]
 
     val indexToResolve = filteredIndexes.reduce((acc: Int, e: Int) => {
-      problem.domains(e) = problem.constraint(problem, e)
       if (problem.domains(acc).length > problem.domains(e).length)
         e
       else
