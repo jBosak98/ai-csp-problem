@@ -1,6 +1,6 @@
 package tools
 
-import model.{CSP, CSPProblem}
+import model.{CSP}
 
 import scala.reflect.ClassTag
 

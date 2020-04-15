@@ -1,9 +1,20 @@
 package tools
 
-import model.{CSP, CSPModel, CSPProblem, QuizVariable}
+import model.{CSP, QuizVariable}
 import tools.sudokuTools._
 
 object domainPuzzle {
+
+
+  def createQuizVariable(variable:Option[QuizVariable], word:Option[String]): Option[QuizVariable] = {
+    Option(QuizVariable(
+      index = variable.get.index,
+      value = word,
+      isVertical = variable.get.isVertical,
+      size = variable.get.size
+    ))
+  }
+
   def calculateDomainOfVariableIndex[V <: QuizVariable](problem: CSP[V], index: Int) = {
     val variable = problem.variables(index).get
 

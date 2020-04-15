@@ -1,11 +1,17 @@
 package tools
 
-import model.{CSP, CSPModel, CSPProblem, QuizVariable}
+import model.{CSP, QuizVariable}
 import tools.sudokuTools._
 
 import scala.reflect.ClassTag
 
 object domainSudoku {
+
+  def createVariableSudoku(a:Option[Int], sudokuValue:Option[String]): Option[Int] = {
+    if (sudokuValue.isDefined) sudokuValue.get.toIntOption
+    else Option.empty[Int]
+  }
+
   def calculateDomain[T: ClassTag, V](sudoku: CSP[Int]): CSP[Int] = {
 
     def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty && !sudoku.isConstant(index) }

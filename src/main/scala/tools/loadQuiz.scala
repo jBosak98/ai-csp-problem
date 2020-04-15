@@ -1,6 +1,6 @@
 package tools
 
-import model.{CSP, CSPProblem, QuizVariable}
+import model.{CSP, QuizVariable}
 
 import scala.io.Source.fromFile
 

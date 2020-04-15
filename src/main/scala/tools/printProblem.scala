@@ -1,6 +1,6 @@
 package tools
 
-import model.{CSP, CSPModel, CSPProblem, QuizVariable}
+import model.{CSP, QuizVariable}
 
 import scala.reflect.runtime.universe._
 

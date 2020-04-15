@@ -1,6 +1,6 @@
 package tools
 
-import model.{CSP, CSPModel, QuizVariable}
+import model.{CSP, QuizVariable}
 import tools.domainPuzzle.getIndicesThatAreFilledByVariable
 
 object buildPuzzle {

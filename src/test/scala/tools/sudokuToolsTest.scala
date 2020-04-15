@@ -1,6 +1,6 @@
 package tools
 
-import model.{CSP, CSPProblem}
+import model.CSP
 import model.types.ValueSudoku
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.{BeforeEach, Test}

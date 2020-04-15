@@ -1,6 +1,7 @@
 import heuristics.lowestDomainSizeHeuristic
 import model._
 import tools._
+import tools.QuizValidations.{areAllFieldsFilled, isProperlyFilled, isProperlyResolved}
 
 object main {
 
@@ -12,20 +13,6 @@ object main {
 
     val sudokus = loadSudokus.loadSudokus(sudokuFilename)
     val quiz: CSP[QuizVariable] = loadQuiz.loadQuiz(puzzleFile, wordsFile)
-
-
-    val createVariableSudoku: (Option[Int], Option[String]) => Option[Int] = { (_, sudokuValue) =>
-      if (sudokuValue.isDefined) sudokuValue.get.toIntOption
-      else Option.empty[Int]
-    }
-    val createQuizVariable = { (variable: Option[QuizVariable], word: Option[String]) =>
-      Option(QuizVariable(
-        index = variable.get.index,
-        value = word,
-        isVertical = variable.get.isVertical,
-        size = variable.get.size
-      ))
-    }
 
 
     val heuristicFilterSudoku: ((Option[Int], Int)) => Boolean = {
@@ -41,21 +28,21 @@ object main {
 
     val sudokuDomainCalculator = DomainCalculator[Int](
       domainSudoku.calculateDomainOfIndex[Int],
-      domainSudoku.calculateDomainOfRelatedFields[Int]
+      domainSudoku.calculateDomainOfRelatedFields[Int],
+      domainSudoku.createVariableSudoku
     )
     val quizDomainCalculator = DomainCalculator[QuizVariable](
-      calculateDomainOfIndex = domainPuzzle.calculateDomainOfVariableIndex[QuizVariable] _,
-      calculateDomainOfDependents = domainPuzzle.calculateDomainOfDependents[QuizVariable] _
+      domainPuzzle.calculateDomainOfVariableIndex[QuizVariable],
+      domainPuzzle.calculateDomainOfDependents[QuizVariable],
+      domainPuzzle.createQuizVariable
     )
 
     val sudokuResolver = resolveProblem.resolveProblem[Int](
       sudokuHeuristic,
-      createVariableSudoku,
       sudokuDomainCalculator
     ) _
     val quizResolver = resolveProblem.resolveProblem[QuizVariable](
       quizHeuristic,
-      createQuizVariable,
       quizDomainCalculator
     ) _
 
@@ -65,7 +52,11 @@ object main {
       sudokuTools.areAllFieldsFilled,
       sudokuTools.isProperlyFilled
     )
-    val quizValidator = getQuizValidator.getQuizValidator()
+    val quizValidator = CSPProblemValidator[QuizVariable](
+      isProperlyResolved,
+      areAllFieldsFilled,
+      isProperlyFilled
+    )
 
 
     sudokus.foreach(s => {

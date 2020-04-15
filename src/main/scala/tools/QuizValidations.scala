@@ -1,8 +1,8 @@
 package tools
 
-import model.{CSP, CSPProblem, CSPProblemValidator, QuizVariable}
+import model.{CSP, CSPProblemValidator, QuizVariable}
 
-object getQuizValidator {
+object QuizValidations {
 
   def isProperlyFilled(problem: CSP[QuizVariable]) = {
     val (numberOfColumn, numberOfRows) = problem.size
@@ -26,19 +26,13 @@ object getQuizValidator {
 
     arePuzzleFilled //&& areVariablesFilled
   }
-
-  def getQuizValidator() = {
-
-    def isProperlyResolved(problem: CSP[QuizVariable]) = {
-      areAllFieldsFilled(problem) && isProperlyFilled(problem)
-    }
-
-    CSPProblemValidator[QuizVariable](
-      isProperlyResolved,
-      areAllFieldsFilled,
-      isProperlyFilled
-    )
+  def isProperlyResolved(problem: CSP[QuizVariable]) = {
+    areAllFieldsFilled(problem) && isProperlyFilled(problem)
   }
+
+
+
+
 
 
 }

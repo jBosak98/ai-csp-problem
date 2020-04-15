@@ -1,6 +1,7 @@
 package heuristics
 
-import model.{CSP, CSPProblem}
+import model.CSP
+
 
 object lowestDomainSizeHeuristic {
 

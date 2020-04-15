@@ -1,21 +1,17 @@
 package tools
 
 import scala.reflect.runtime.universe._
-import model.{CSP, CSPProblem, CSPProblemValidator, DomainCalculator, QuizVariable}
+import model.{CSP, CSPProblemValidator, DomainCalculator, QuizVariable}
 
 object resolveProblem {
 
   var steps = 0
 
   def resolveProblem[V: TypeTag]
-  (
-    indexSelectionHeuristic: CSP[V] => Option[Int],
-    createVariable: (Option[V], Option[String]) => Option[V],
-    domainCalculator: DomainCalculator[V]
-  )
+  (indexSelectionHeuristic: CSP[V] => Option[Int], domainCalculator: DomainCalculator[V])
   (problem: CSP[V], validatorCSP: CSPProblemValidator[V]): Boolean = {
     val position = indexSelectionHeuristic(problem)
-    val resolveField = resolveFieldGenerator[V](indexSelectionHeuristic, createVariable, domainCalculator)(validatorCSP)
+    val resolveField = resolveFieldGenerator[V](indexSelectionHeuristic, domainCalculator)(validatorCSP)
     if (position.isDefined) {
       resolveField(problem, position.get)
     }
@@ -26,10 +22,7 @@ object resolveProblem {
   }
 
   def resolveFieldGenerator[V: TypeTag]
-  (getNextIndex: CSP[V] => Option[Int],
-   createVariable: (Option[V], Option[String]) => Option[V],
-   domainCalculator: DomainCalculator[V]
-  )
+  (getNextIndex: CSP[V] => Option[Int], domainCalculator: DomainCalculator[V])
   (validatorCSP: CSPProblemValidator[V]): (CSP[V], Int) => Boolean = {
 
     def resolveField(problem: CSP[V], index: Int): Boolean = {
@@ -38,7 +31,7 @@ object resolveProblem {
       //      printProblem.printProblem[V](problem.asInstanceOf[CSPProblem[V]])
 
       def isValueProper: String => Boolean = { value =>
-        problem.variables(index) = createVariable(problem.variables(index), Option(value))
+        problem.variables(index) = domainCalculator.createVariableFromDomainValue(problem.variables(index), Option(value))
         domainCalculator.calculateDomainOfDependents(problem, index)
         steps = steps + 1
 
@@ -53,11 +46,9 @@ object resolveProblem {
             validatorCSP.isProperlyFilled(problem)
           }
         }
-
-
       }
 
-      problem.variables(index) = createVariable(
+      problem.variables(index) = domainCalculator.createVariableFromDomainValue(
         problem.variables(index),
         domain.find(isValueProper)
       )
