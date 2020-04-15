@@ -6,23 +6,23 @@ import tools.sudokuTools._
 import scala.reflect.ClassTag
 
 object domainSudoku {
-//  def calculateDomain[T: ClassTag, V](sudoku: CSP[Int]): CSP[Int] = {
-//
-//    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty && !sudoku.isConstant(index) }
-//
-//    def getDomainForEach: Int => Any = { index =>
-//      sudoku.domains(index) =
-//        if (filterDefinedValues(index)) List[String]()
-//        else sudoku.constraint(sudoku, index)
-//    }
-//
-//    sudoku
-//      .variables
-//      .indices
-//      .foreach(getDomainForEach)
-//
-//    sudoku
-//  }
+  def calculateDomain[T: ClassTag, V](sudoku: CSP[Int]): CSP[Int] = {
+
+    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty && !sudoku.isConstant(index) }
+
+    def getDomainForEach: Int => Any = { index =>
+      sudoku.domains(index) =
+        if (filterDefinedValues(index)) List[String]()
+        else calculateDomainOfIndex(sudoku, index)
+    }
+
+    sudoku
+      .variables
+      .indices
+      .foreach(getDomainForEach)
+
+    sudoku
+  }
 
   def calculateDomainOfIndex[V <: Int:ClassTag](sudoku: CSP[V], index: Int): List[String] = {
     val row = getRowAtIndex(sudoku.variables, sudoku.size, index)
