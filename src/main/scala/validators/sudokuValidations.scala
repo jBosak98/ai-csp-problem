@@ -31,7 +31,7 @@ object sudokuValidations {
       .exists(isValueProperlyFilled)
   }
 
-  def isDomainProper[V <:Int:ClassTag](sudoku: CSP[V]): Boolean = {
+  def isDomainProper[V <: Int : ClassTag](sudoku: CSP[V]): Boolean = {
 
     def filterDefinedValues: ((Option[V], Int)) => Boolean = {
       case (variable, _) => variable.isEmpty
@@ -39,7 +39,7 @@ object sudokuValidations {
 
     def mapIsAnyDomainEmpty: ((Option[V], Int)) => Boolean = {
       case (_, index) =>
-                sudoku.domains(index).isEmpty
+        sudoku.domains(index).isEmpty
     }
 
     !sudoku

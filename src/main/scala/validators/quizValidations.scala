@@ -8,6 +8,10 @@ import scala.reflect.ClassTag
 
 object quizValidations {
 
+  def isProperlyResolved(problem: CSP[QuizVariable]) = {
+    areAllFieldsFilled(problem) && isProperlyFilled(problem)
+  }
+
   def isProperlyFilled(problem: CSP[QuizVariable]) = {
     val (numberOfColumn, numberOfRows) = problem.size
     val puzzle = buildPuzzle.buildPuzzle(problem)
@@ -34,19 +38,14 @@ object quizValidations {
     arePuzzleFilled && areAllVariablesFilled
   }
 
-
-  def isProperlyResolved(problem: CSP[QuizVariable]) = {
-    areAllFieldsFilled(problem) && isProperlyFilled(problem)
-  }
-
-  def isDomainProper[V <:QuizVariable:ClassTag](sudoku: CSP[V]): Boolean = {
+  def isDomainProper[V <: QuizVariable : ClassTag](sudoku: CSP[V]): Boolean = {
 
     def filterDefinedValues: ((Option[V], Int)) => Boolean = {
       case (variable, _) => variable.get.value.isEmpty
     }
 
     def mapIsAnyDomainEmpty: ((Option[V], Int)) => Boolean = {
-      case (_, index) =>false
+      case (_, index) => false
       //          sudoku.domains(index).isEmpty
     }
 
@@ -56,8 +55,6 @@ object quizValidations {
       .filter(filterDefinedValues)
       .exists(mapIsAnyDomainEmpty)
   }
-
-
 
 
 }

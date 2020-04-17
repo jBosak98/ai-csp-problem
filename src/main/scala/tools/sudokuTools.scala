@@ -32,17 +32,24 @@ object sudokuTools {
     if (!_isProperIndex(index)) None
     else Option((index % (size._1)) + 1)
 
+  private def _isProperIndex(index: Int): Boolean = true //worked only for sudoku 9x9 :(
 
+  def row[T: ClassTag](values: Array[T], size: (Int, Int), rowNumber: Int): Array[T] =
+    if (rowNumber < 1 || rowNumber > size._2) Array.empty[T]
+    else values.slice((rowNumber - 1) * size._1, (rowNumber - 1) * size._1 + size._1)
 
   def getRowAtIndex[T: ClassTag](values: Array[T], size: (Int, Int), index: Int): Array[T] =
     row[T](values, size, (index / size._1) + 1)
+
+  //    index >= 0 && index < 81
 
   def getColumnAtIndex[T: ClassTag](values: Array[T], size: (Int, Int), index: Int): Array[T] =
     if (!_isProperIndex(index)) Array.empty[T]
     else column(values, size, getColumnNumber(index, size).get)
 
-  private def _isProperIndex(index: Int): Boolean = true //worked only for sudoku 9x9 :(
-  //    index >= 0 && index < 81
+  //  def getFromSudoku[T:ClassTag](values: Array[T], rowNumber: Int, columnNumber: Int): Option[T] =
+  //    if (columnNumber < 1 || columnNumber > 9 || rowNumber < 1 || rowNumber > 9) Option.empty[T]
+  //    else row[T](values, rowNumber)(columnNumber - 1)
 
   def column[T: ClassTag](values: Array[T], size: (Int, Int), columnNumber: Int): Array[T] =
     if (columnNumber < 1 || columnNumber > size._1) Array.empty[T]
@@ -50,20 +57,10 @@ object sudokuTools {
       if i % size._1 == columnNumber - 1 => values(i)
     }.toArray
 
-  //  def getFromSudoku[T:ClassTag](values: Array[T], rowNumber: Int, columnNumber: Int): Option[T] =
-  //    if (columnNumber < 1 || columnNumber > 9 || rowNumber < 1 || rowNumber > 9) Option.empty[T]
-  //    else row[T](values, rowNumber)(columnNumber - 1)
-
   def getIndicesOfRow(rowNumber: Int, size: (Int, Int)): Array[Int] = {
     val indices = (0 until size._1 * size._2).toArray
     row(indices, size, rowNumber)
   }
-
-  def row[T: ClassTag](values: Array[T], size: (Int, Int), rowNumber: Int): Array[T] =
-    if (rowNumber < 1 || rowNumber > size._2) Array.empty[T]
-    else values.slice((rowNumber - 1) * size._1, (rowNumber - 1) * size._1 + size._1)
-
-
 
 
 }

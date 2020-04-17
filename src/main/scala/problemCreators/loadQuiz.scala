@@ -1,7 +1,7 @@
 package problemCreators
 
-import domainCalculations.domainPuzzle
 import model.{CSP, QuizVariable}
+import tools.puzzleTools._
 import tools.sudokuTools
 
 import scala.io.Source.fromFile
@@ -42,7 +42,7 @@ object loadQuiz {
 
 
     val verticalWords = (1 to numberOfColumn).flatMap { columnNumber =>
-      val indices = domainPuzzle.getIndicesOfColumn(columnNumber, size)
+      val indices = getIndicesOfColumn(columnNumber, size)
       val words = sudokuTools.column(puzzle, size, columnNumber).map(_.getOrElse("_")).mkString("").replace("#", "#!#").split("#")
       createQuizVariable(Array.empty[QuizVariable], words, indices, isVertical = true)
     }

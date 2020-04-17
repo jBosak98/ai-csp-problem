@@ -1,12 +1,12 @@
 package problemCreators
 
-import domainCalculations.domainPuzzle.getIndicesThatAreFilledByVariable
+import tools.puzzleTools.getIndicesThatAreFilledByVariable
 import model.{CSP, QuizVariable}
 
 object buildPuzzle {
   def buildPuzzle(problem: CSP[QuizVariable]): Array[Option[Char]] = {
     val puzzle = Array.fill(problem.size._1 * problem.size._2)(Option('-'))
-    problem.isConstant.zipWithIndex.filter(_._1).foreach {case (_:Boolean, index:Int) =>
+    problem.isConstant.zipWithIndex.filter(_._1).foreach { case (_: Boolean, index: Int) =>
       puzzle(index) = Option.empty[Char]
     }
     val variables = problem.variables.map(_.get)
@@ -27,7 +27,7 @@ object buildPuzzle {
       val variableIndices = getIndicesThatAreFilledByVariable(problem, variable)
       variableIndices.indices.foreach { i =>
         val variableValue = variable.value.getOrElse("@")
-        puzzle(variableIndices(i)) = if(variableValue != "@") Option(variableValue(i)) else puzzle(variableIndices(i))
+        puzzle(variableIndices(i)) = if (variableValue != "@") Option(variableValue(i)) else puzzle(variableIndices(i))
       }
       _buildPuzzle(problem, puzzle, variables.drop(1))
     }

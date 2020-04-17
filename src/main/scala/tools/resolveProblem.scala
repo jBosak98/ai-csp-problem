@@ -25,7 +25,7 @@ object resolveProblem {
   def resolveFieldGenerator[V: TypeTag]
   (getNextIndex: CSP[V] => Option[Int], domainCalculator: DomainCalculator[V])
   (validatorCSP: CSPProblemValidator[V]): (CSP[V], Int) => Boolean = {
-    val calculateDomainOfIndex =  domainCalculator.calculateDomainOfIndex
+    val calculateDomainOfIndex = domainCalculator.calculateDomainOfIndex
     val createVariableFromDomainValue = domainCalculator.createVariableFromDomainValue
     val calculateDomainOfDependents = domainCalculator.calculateDomainOfDependents
 
@@ -33,7 +33,7 @@ object resolveProblem {
     val isProperlyFilled = validatorCSP.isProperlyFilled
 
 
-    def resetVariableAndRefreshDomain(problem:CSP[V] , index:Int) = {
+    def resetVariableAndRefreshDomain(problem: CSP[V], index: Int) = {
       problem.variables(index) = domainCalculator.createVariableFromDomainValue(problem.variables(index), Option.empty)
       calculateDomainOfDependents(problem, index)
       false
@@ -67,7 +67,7 @@ object resolveProblem {
 
       val properValue = domain.find(isValueProper)
 
-      problem.variables(index) = createVariableFromDomainValue(problem.variables(index),properValue)
+      problem.variables(index) = createVariableFromDomainValue(problem.variables(index), properValue)
       true
     }
 
