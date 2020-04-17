@@ -1,7 +1,9 @@
 package validators
 
-import model.CSP
+import model.{CSP, QuizVariable}
 import tools.sudokuTools.{getBox, getColumnAtIndex, getRowAtIndex}
+
+import scala.reflect.ClassTag
 
 object sudokuValidations {
 
@@ -27,5 +29,23 @@ object sudokuValidations {
       .variables
       .indices
       .exists(isValueProperlyFilled)
+  }
+
+  def isDomainProper[V <:Int:ClassTag](sudoku: CSP[V]): Boolean = {
+
+    def filterDefinedValues: ((Option[V], Int)) => Boolean = {
+      case (variable, _) => variable.isEmpty
+    }
+
+    def mapIsAnyDomainEmpty: ((Option[V], Int)) => Boolean = {
+      case (_, index) =>
+                sudoku.domains(index).isEmpty
+    }
+
+    !sudoku
+      .variables
+      .zipWithIndex
+      .filter(filterDefinedValues)
+      .exists(mapIsAnyDomainEmpty)
   }
 }

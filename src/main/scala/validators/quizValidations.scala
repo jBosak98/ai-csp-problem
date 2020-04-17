@@ -4,6 +4,8 @@ import model.{CSP, QuizVariable}
 import problemCreators.buildPuzzle
 import tools.sudokuTools
 
+import scala.reflect.ClassTag
+
 object quizValidations {
 
   def isProperlyFilled(problem: CSP[QuizVariable]) = {
@@ -17,22 +19,43 @@ object quizValidations {
     }.mkString(" ")
     val allLines = columnLines + rowLines
     val isFilled = problem.availableValues.forall(word => allLines.contains(word))
-    isFilled
+
+
+    areAllFieldsFilled(problem) && isFilled
   }
 
   def areAllFieldsFilled(problem: CSP[QuizVariable]) = {
-    val arePuzzleFilled = buildPuzzle.buildPuzzle(problem).exists { char =>
-      char.isEmpty || !(char.get.isLetter && char.get.equals("#"))
-    }
-    val areVariablesFilled = problem.variables.map(_.get).exists(_.value.isEmpty)
+    val arePuzzleFilled = buildPuzzle.buildPuzzle(problem).exists(_.isEmpty)
 
-    arePuzzleFilled //&& areVariablesFilled
+    val areAllVariablesFilled = problem
+      .variables
+      .exists(variable => variable.isEmpty || (variable.isDefined && variable.get.value.isDefined))
+
+    arePuzzleFilled && areAllVariablesFilled
   }
+
+
   def isProperlyResolved(problem: CSP[QuizVariable]) = {
     areAllFieldsFilled(problem) && isProperlyFilled(problem)
   }
 
+  def isDomainProper[V <:QuizVariable:ClassTag](sudoku: CSP[V]): Boolean = {
 
+    def filterDefinedValues: ((Option[V], Int)) => Boolean = {
+      case (variable, _) => variable.get.value.isEmpty
+    }
+
+    def mapIsAnyDomainEmpty: ((Option[V], Int)) => Boolean = {
+      case (_, index) =>false
+      //          sudoku.domains(index).isEmpty
+    }
+
+    !sudoku
+      .variables
+      .zipWithIndex
+      .filter(filterDefinedValues)
+      .exists(mapIsAnyDomainEmpty)
+  }
 
 
 

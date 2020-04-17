@@ -1,6 +1,6 @@
 package tools
 
-import model.{CSP}
+import model.CSP
 
 import scala.reflect.ClassTag
 
@@ -30,7 +30,7 @@ object sudokuTools {
 
   def getColumnNumber(index: Int, size: (Int, Int)): Option[Int] =
     if (!_isProperIndex(index)) None
-    else Option((index % size._1) + 1)
+    else Option((index % (size._1)) + 1)
 
 
 
@@ -39,7 +39,7 @@ object sudokuTools {
 
   def getColumnAtIndex[T: ClassTag](values: Array[T], size: (Int, Int), index: Int): Array[T] =
     if (!_isProperIndex(index)) Array.empty[T]
-    else column(values, size, (index % size._2) + 1)
+    else column(values, size, getColumnNumber(index, size).get)
 
   private def _isProperIndex(index: Int): Boolean = true //worked only for sudoku 9x9 :(
   //    index >= 0 && index < 81
@@ -63,10 +63,7 @@ object sudokuTools {
     if (rowNumber < 1 || rowNumber > size._2) Array.empty[T]
     else values.slice((rowNumber - 1) * size._1, (rowNumber - 1) * size._1 + size._1)
 
-  def getIndicesOfColumn(columnNumber: Int, size: (Int, Int)): Array[Int] = {
-    val indices = (0 until size._1 * size._2).toArray
-    column(indices, size, columnNumber)
-  }
+
 
 
 }

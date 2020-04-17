@@ -37,7 +37,7 @@ class sudokuToolsTest {
 
   @Test private[tools] def getColumnAtIndexTest() = {
     assertEquals(9, getColumnAtIndex(s1.variables, s1.size, 80).length)
-    assertEquals(0, getColumnAtIndex(s1.variables, s1.size, 81).length)
+    assertEquals(9, getColumnAtIndex(s1.variables, s1.size, 81).length)
     assertEquals(
       row[ValueSudoku](s1.variables, s1.size,1).apply(5),
       getColumnAtIndex[ValueSudoku](s1.variables, s1.size, 5).head
@@ -97,7 +97,7 @@ class sudokuToolsTest {
 
   @Test private[tools] def getColumnNumberTest() = {
 
-    assertEquals(9, getColumnNumber(44,s1.size).get)
+
     assertEquals(1, getColumnNumber(0,s1.size).get)
     assertEquals(2, getColumnNumber(1,s1.size).get)
     assertEquals(3, getColumnNumber(2,s1.size).get)
@@ -109,6 +109,7 @@ class sudokuToolsTest {
     assertEquals(9, getColumnNumber(8,s1.size).get)
     assertEquals(1, getColumnNumber(9,s1.size).get)
     assertEquals(2, getColumnNumber(10,s1.size).get)
+    assertEquals(9, getColumnNumber(44,s1.size).get)
   }
 
   @Test private[tools] def columnTest() = {

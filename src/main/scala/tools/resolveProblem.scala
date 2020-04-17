@@ -1,9 +1,8 @@
 package tools
 
-import domainCalculations.domainSudoku
+import model.{CSP, CSPProblemValidator, DomainCalculator, QuizVariable}
 
 import scala.reflect.runtime.universe._
-import model.{CSP, CSPProblemValidator, DomainCalculator, QuizVariable}
 
 object resolveProblem {
 
@@ -26,34 +25,49 @@ object resolveProblem {
   def resolveFieldGenerator[V: TypeTag]
   (getNextIndex: CSP[V] => Option[Int], domainCalculator: DomainCalculator[V])
   (validatorCSP: CSPProblemValidator[V]): (CSP[V], Int) => Boolean = {
+    val calculateDomainOfIndex =  domainCalculator.calculateDomainOfIndex
+    val createVariableFromDomainValue = domainCalculator.createVariableFromDomainValue
+    val calculateDomainOfDependents = domainCalculator.calculateDomainOfDependents
+
+    val isDomainProper = validatorCSP.isDomainProper
+    val isProperlyFilled = validatorCSP.isProperlyFilled
+
+
+    def resetVariableAndRefreshDomain(problem:CSP[V] , index:Int) = {
+      problem.variables(index) = domainCalculator.createVariableFromDomainValue(problem.variables(index), Option.empty)
+      calculateDomainOfDependents(problem, index)
+      false
+    }
 
     def resolveField(problem: CSP[V], index: Int): Boolean = {
 
-      val domain = domainCalculator.calculateDomainOfIndex(problem, index)
-      //      printProblem.printProblem[V](problem.asInstanceOf[CSPProblem[V]])
+      val domain = calculateDomainOfIndex(problem, index)
+
+      //printProblem.printProblem[V](problem.asInstanceOf[CSPProblem[V]])
 
       def isValueProper: String => Boolean = { value =>
-        problem.variables(index) = domainCalculator.createVariableFromDomainValue(problem.variables(index), Option(value))
+        problem.variables(index) = createVariableFromDomainValue(problem.variables(index), Option(value))
         domainCalculator.calculateDomainOfDependents(problem, index)
         steps = steps + 1
 
-        if (!domainSudoku.isDomainProper(problem)) {
-          false
-        } else {
+        if (isDomainProper(problem)) {
           val indexToResolve = getNextIndex(problem)
-          if (indexToResolve.isEmpty) {
-            true
-          } else {
+          if (indexToResolve.isEmpty) true
+
+          else {
             resolveField(problem, indexToResolve.get)
-            validatorCSP.isProperlyFilled(problem)
+            if (isProperlyFilled(problem)) true
+            else resetVariableAndRefreshDomain(problem, index)
+
           }
-        }
+        } else resetVariableAndRefreshDomain(problem, index)
+
+
       }
 
-      problem.variables(index) = domainCalculator.createVariableFromDomainValue(
-        problem.variables(index),
-        domain.find(isValueProper)
-      )
+      val properValue = domain.find(isValueProper)
+
+      problem.variables(index) = createVariableFromDomainValue(problem.variables(index),properValue)
       true
     }
 

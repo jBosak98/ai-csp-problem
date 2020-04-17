@@ -1,5 +1,6 @@
 package problemCreators
 
+import domainCalculations.domainPuzzle
 import model.{CSP, QuizVariable}
 import tools.sudokuTools
 
@@ -41,7 +42,7 @@ object loadQuiz {
 
 
     val verticalWords = (1 to numberOfColumn).flatMap { columnNumber =>
-      val indices = sudokuTools.getIndicesOfColumn(columnNumber, size)
+      val indices = domainPuzzle.getIndicesOfColumn(columnNumber, size)
       val words = sudokuTools.column(puzzle, size, columnNumber).map(_.getOrElse("_")).mkString("").replace("#", "#!#").split("#")
       createQuizVariable(Array.empty[QuizVariable], words, indices, isVertical = true)
     }

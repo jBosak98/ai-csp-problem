@@ -1,6 +1,6 @@
 package domainCalculations
 
-import model.CSP
+import model.{CSP, QuizVariable}
 import tools.sudokuTools.{getBox, getColumnAtIndex, getRowAtIndex}
 
 import scala.reflect.ClassTag
@@ -14,12 +14,13 @@ object domainSudoku {
 
   def calculateDomain[T: ClassTag, V](sudoku: CSP[Int]): CSP[Int] = {
 
-    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isEmpty && !sudoku.isConstant(index) }
+    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isDefined && sudoku.isConstant(index) }
 
     def getDomainForEach: Int => Any = { index =>
       sudoku.domains(index) =
         if (filterDefinedValues(index)) List[String]()
-        else calculateDomainOfIndex(sudoku, index)
+        else
+          calculateDomainOfIndex(sudoku, index)
     }
 
     sudoku
@@ -47,27 +48,21 @@ object domainSudoku {
     val rowIndices = getRowAtIndex(indexes, sudoku.size, index)
     val columnIndices = getColumnAtIndex(indexes, sudoku.size, index)
     val boxIndices = getBox(indexes, sudoku.size, index)
+    if(index == 40 || index == 27){
+      sudoku.domains(16) = calculateDomainOfIndex[V](sudoku, 16)
+      sudoku.domains(9) = calculateDomainOfIndex[V](sudoku, 9)
+    }
+    val valuesToCalculate = ((rowIndices ++ columnIndices ++ boxIndices ))
+      .distinct
+      .filter(i => sudoku.variables(i).isEmpty)
 
-    val valuesToCalculate = (rowIndices ++ columnIndices ++ boxIndices).distinct
-    valuesToCalculate.foreach(index => {
-      sudoku.domains(index) = calculateDomainOfIndex[V](sudoku, index)
+    valuesToCalculate
+      .foreach(i => {
+      sudoku.domains(i) = calculateDomainOfIndex[V](sudoku, i)
     })
     sudoku.domains(index)
   }
 
 
-  def isDomainProper[V](sudoku: CSP[V]): Boolean = {
 
-    def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isDefined }
-
-    def mapIsAnyDomainEmpty: Int => Boolean = { index =>false
-
-    }
-
-    !sudoku
-      .variables
-      .indices
-      .filter(filterDefinedValues)
-      .exists(mapIsAnyDomainEmpty)
-  }
 }

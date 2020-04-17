@@ -1,25 +1,24 @@
 import domainCalculations.{domainPuzzle, domainSudoku}
 import heuristics.lowestDomainSizeHeuristic
 import model._
-import problemCreators.{loadQuiz, loadSudokus, printProblem}
+import problemCreators.{loadQuiz, loadSudokus}
 import tools._
-import validators.quizValidations.{areAllFieldsFilled, isProperlyFilled, isProperlyResolved}
-import validators.sudokuValidations
+import validators.{quizValidations, sudokuValidations}
 
 object main {
 
   def main(args: Array[String]): Unit = {
-    val sudokuFilename = "src/main/resources/ai-lab2-2020-dane/Sudoku2.csv"
-    val quizNumber = 2
-    val puzzleFile = s"src/main/resources/ai-lab2-2020-dane/Jolka/puzzle${quizNumber}"
-    val wordsFile = s"src/main/resources/ai-lab2-2020-dane/Jolka/words${quizNumber}"
+    val sudokuFilename = "src/main/resources/ai-lab2-2020-dane/Sudoku.csv"
+    val quizNumber = 28
+    val puzzleFile = s"src/main/resources/data/puzzle${quizNumber}"
+    val wordsFile = s"src/main/resources/data/words${quizNumber}"
 
     val sudokus = loadSudokus.loadSudokus(sudokuFilename)
     val quiz: CSP[QuizVariable] = loadQuiz.loadQuiz(puzzleFile, wordsFile)
 
 
     val heuristicFilterSudoku: ((Option[Int], Int)) => Boolean = {
-      case (variable: Option[Int], index: Int) => variable.isEmpty
+      case (variable: Option[Int], index: Int) =>  variable.isEmpty
     }
     val heuristicFilterPuzzle: ((Option[QuizVariable], Int)) => Boolean = {
       case (variable: Option[QuizVariable], index: Int) => variable.get.value.isEmpty
@@ -37,7 +36,7 @@ object main {
     val quizDomainCalculator = DomainCalculator[QuizVariable](
       domainPuzzle.calculateDomainOfVariableIndex[QuizVariable],
       domainPuzzle.calculateDomainOfDependents[QuizVariable],
-      domainPuzzle.createQuizVariable
+      domainPuzzle.createQuizVariable(quiz)
     )
 
     val sudokuResolver = resolveProblem.resolveProblem[Int](
@@ -53,27 +52,37 @@ object main {
     val sudokuValidator = CSPProblemValidator[Int](
       sudokuValidations.isProperlyResolved,
       sudokuValidations.areAllFieldsFilled,
-      sudokuValidations.isProperlyFilled
+      sudokuValidations.isProperlyFilled,
+      sudokuValidations.isDomainProper
     )
     val quizValidator = CSPProblemValidator[QuizVariable](
-      isProperlyResolved,
-      areAllFieldsFilled,
-      isProperlyFilled
+      quizValidations.isProperlyResolved,
+      quizValidations.areAllFieldsFilled,
+      quizValidations.isProperlyFilled,
+      quizValidations.isDomainProper
     )
 
+//    sudokus.foreach(s => {
+//      domainSudoku.calculateDomain(s)
+//    timer.timer({
+//        sudokus.head.domains.foreach(println)
+//        sudokuResolver(s, sudokuValidator)
 
-    sudokus.foreach(s => {
-      domainSudoku.calculateDomain(s)
-      sudokuResolver(s, sudokuValidator)
-      printProblem.printProblem(s)
+//      })
+//      printProblem.printProblem(s)
+//    })
+
+//
+    timer.timer({
+
+      domainPuzzle.calculateDomainForEachVariables(quiz)
+
+      quizResolver(quiz, quizValidator)
+//      printProblem.printProblem(quiz)
+//      ""
     })
 
-    //    time += timer.timer({
-    domainPuzzle.calculateDomainForEachVariables(quiz)
-    quizResolver(quiz, quizValidator)
-    //    })
 
-    printProblem.printProblem(quiz)
   }
 
 

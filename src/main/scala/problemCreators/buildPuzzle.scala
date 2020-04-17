@@ -5,7 +5,7 @@ import model.{CSP, QuizVariable}
 
 object buildPuzzle {
   def buildPuzzle(problem: CSP[QuizVariable]): Array[Option[Char]] = {
-    var puzzle = Array.fill(problem.size._1 * problem.size._2)(Option('-'))
+    val puzzle = Array.fill(problem.size._1 * problem.size._2)(Option('-'))
     problem.isConstant.zipWithIndex.filter(_._1).foreach {case (_:Boolean, index:Int) =>
       puzzle(index) = Option.empty[Char]
     }

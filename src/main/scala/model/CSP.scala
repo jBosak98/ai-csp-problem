@@ -6,7 +6,7 @@ case class CSP[V](
                           domains: Array[List[String]],
                           isConstant: Array[Boolean],
                           size: (Int, Int),
-                          availableValues: List[String]
-                        ) //extends CSPModel[V]
+                          var availableValues: List[String]
+                        )
 
 
