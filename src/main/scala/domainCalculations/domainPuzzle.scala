@@ -86,10 +86,11 @@ object domainPuzzle {
     if (IsWordProperForVariable) Option(availableValue) else Option.empty[String]
   }
 
-  def calculateDomainForEachVariables[V <: QuizVariable](problem: CSP[V]) = {
+  def calculateDomainForEachVariables[V <: QuizVariable](problem: CSP[V], index:Int) = {
     problem.variables.indices.foreach { i =>
       problem.domains(i) = domainPuzzle.calculateDomainOfVariableIndex(problem, i)
     }
+    problem.domains(index)
 
   }
 

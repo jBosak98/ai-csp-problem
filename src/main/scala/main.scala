@@ -4,7 +4,7 @@ import heuristics.getRandomIndexHeuristic.getRandomIndex
 import heuristics.lowestDomainSizeHeuristic.getIndexWithTheLowestDomainSize
 import heuristics.nextIndexHeuristicGenerator
 import model._
-import problemCreators.{loadQuiz, loadSudokus}
+import problemCreators.{loadQuiz, loadSudokus, printProblem}
 import tools._
 import validators.{quizValidations, sudokuValidations}
 
@@ -37,11 +37,13 @@ object main {
     val sudokuDomainCalculator = DomainCalculator[Int](
       domainSudoku.calculateDomainOfIndex[Int],
       domainSudoku.calculateDomainOfRelatedFields[Int],
+      domainSudoku.calculateDomainForEachVariables[Int],
       domainSudoku.createVariableSudoku
     )
     val quizDomainCalculator = DomainCalculator[QuizVariable](
       domainPuzzle.calculateDomainOfVariableIndex[QuizVariable],
       domainPuzzle.calculateDomainOfDependents[QuizVariable],
+      domainPuzzle.calculateDomainForEachVariables[QuizVariable],
       domainPuzzle.createQuizVariable(quiz)
     )
 
@@ -70,20 +72,17 @@ object main {
 
 //    sudokus.foreach(s => {
 //      domainSudoku.calculateDomain(s)
-//    timer.timer({
-//        sudokus.head.domains.foreach(println)
-//        sudokuResolver(s, sudokuValidator)
-
-//      })
-//      printProblem.printProblem(s)
-//    })
-
-//
     timer.timer({
+//        sudokus.head.domains.foreach(println)
+        sudokuResolver(sudokus.head, sudokuValidator, true)
 
-      domainPuzzle.calculateDomainForEachVariables(quiz)
-
-      quizResolver(quiz, quizValidator)
+      })
+      printProblem.printProblem(sudokus.head)
+//    })
+//
+////
+    timer.timer({
+      quizResolver(quiz, quizValidator, false)
 //      printProblem.printProblem(quiz)
 //      ""
     })

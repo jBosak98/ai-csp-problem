@@ -10,9 +10,18 @@ object resolveProblem {
 
   def resolveProblem[V: TypeTag]
   (indexSelectionHeuristic: CSP[V] => Option[Int], domainCalculator: DomainCalculator[V])
-  (problem: CSP[V], validatorCSP: CSPProblemValidator[V]): Boolean = {
+  (problem: CSP[V], validatorCSP: CSPProblemValidator[V], forwardChecking:Boolean): Boolean = {
     val position = indexSelectionHeuristic(problem)
-    val resolveField = resolveFieldGenerator[V](indexSelectionHeuristic, domainCalculator)(validatorCSP)
+
+    val domainCalc = if (forwardChecking) domainCalculator else DomainCalculator(
+      calculateDomainOfIndex = domainCalculator.calculateDomainOfIndex,
+      calculateDomainForEachVariables = {(_:CSP[V], _:Int) => List.empty[String]},
+      calculateDomainOfDependents = {(_:CSP[V], _:Int) => List.empty[String]},
+      createVariableFromDomainValue = domainCalculator.createVariableFromDomainValue
+    )
+
+    domainCalculator.calculateDomainForEachVariables(problem, 0)
+    val resolveField = resolveFieldGenerator[V](indexSelectionHeuristic, domainCalc)(validatorCSP)
     if (position.isDefined) {
       resolveField(problem, position.get)
     }

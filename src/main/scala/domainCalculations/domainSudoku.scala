@@ -12,6 +12,14 @@ object domainSudoku {
     else Option.empty[Int]
   }
 
+
+  def calculateDomainForEachVariables[V <: Int : ClassTag](sudoku:CSP[V], index:Int) = {
+      sudoku.domains.indices.foreach { i =>
+        sudoku.domains(i) = calculateDomainOfIndex(sudoku, i)
+      }
+    sudoku.domains(index)
+  }
+
   def calculateDomain[T: ClassTag, V](sudoku: CSP[Int]): CSP[Int] = {
 
     def filterDefinedValues: Int => Boolean = { index => sudoku.variables(index).isDefined && sudoku.isConstant(index) }
