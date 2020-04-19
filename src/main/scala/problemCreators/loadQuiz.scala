@@ -49,15 +49,20 @@ object loadQuiz {
   def createVariables(puzzle: Array[Option[String]], size: (Int, Int)): Array[QuizVariable] = {
     val (numberOfColumn, numberOfRows) = size
 
+    val getWordsFromLine = {line:Array[Option[String]] =>
+      line.map(_.getOrElse("_")).mkString("").replace("#", "#!#").split("#")
+    }
 
     val verticalWords = (1 to numberOfColumn).flatMap { columnNumber =>
       val indices = getIndicesOfColumn(columnNumber, size)
-      val words = sudokuTools.column(puzzle, size, columnNumber).map(_.getOrElse("_")).mkString("").replace("#", "#!#").split("#")
+      val words = getWordsFromLine(sudokuTools.column(puzzle, size, columnNumber))
+
       createQuizVariable(Array.empty[QuizVariable], words, indices, isVertical = true)
     }
     val horizontalWords: IndexedSeq[QuizVariable] = (1 to numberOfRows) flatMap { rowNumber =>
       val indices = sudokuTools.getIndicesOfRow(rowNumber, size)
-      val words = sudokuTools.row(puzzle, size, rowNumber).map(_.getOrElse("_")).mkString("").replace("#", "#!#").split("#")
+      val words = getWordsFromLine(sudokuTools.row(puzzle, size, rowNumber))
+
       createQuizVariable(Array.empty[QuizVariable], words, indices, isVertical = false)
     }
 
