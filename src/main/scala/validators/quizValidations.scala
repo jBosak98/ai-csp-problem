@@ -38,7 +38,7 @@ object quizValidations {
     arePuzzleFilled && areAllVariablesFilled
   }
 
-  def isDomainProper[V <: QuizVariable : ClassTag](sudoku: CSP[V]): Boolean = {
+  def isDomainProper[V <: QuizVariable : ClassTag](sudoku: CSP[V], forward:Boolean): Boolean = {
 
     def filterDefinedValues: ((Option[V], Int)) => Boolean = {
       case (variable, _) => variable.get.value.isEmpty

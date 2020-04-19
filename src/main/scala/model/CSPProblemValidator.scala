@@ -6,5 +6,5 @@ case class CSPProblemValidator[V](
                                    isProperlyResolved: Validator[V],
                                    areAllFieldsFilled: Validator[V],
                                    isProperlyFilled: Validator[V],
-                                   isDomainProper: Validator[V]
+                                   isDomainProper: (CSP[V], Boolean) => Boolean
                                  )

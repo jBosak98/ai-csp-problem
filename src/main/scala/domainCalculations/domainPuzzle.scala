@@ -8,7 +8,7 @@ import scala.reflect.runtime.universe._
 
 object domainPuzzle {
 
-  def createQuizVariable(problem: CSP[QuizVariable])(variable: Option[QuizVariable], word: Option[String]): Option[QuizVariable] = {
+  def createQuizVariable(variable: Option[QuizVariable], word: Option[String]): Option[QuizVariable] = {
     Option(QuizVariable(
       index = variable.get.index,
       value = word,

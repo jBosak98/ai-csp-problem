@@ -19,9 +19,11 @@ object resolveProblem {
       calculateDomainOfDependents = {(_:CSP[V], _:Int) => List.empty[String]},
       createVariableFromDomainValue = domainCalculator.createVariableFromDomainValue
     )
+    if(forwardChecking){
+      domainCalculator.calculateDomainForEachVariables(problem, 0)
+    }
 
-    domainCalculator.calculateDomainForEachVariables(problem, 0)
-    val resolveField = resolveFieldGenerator[V](indexSelectionHeuristic, domainCalc)(validatorCSP)
+    val resolveField = resolveFieldGenerator[V](indexSelectionHeuristic, domainCalc, forwardChecking)(validatorCSP)
     if (position.isDefined) {
       resolveField(problem, position.get)
     }
@@ -35,7 +37,7 @@ object resolveProblem {
   }
 
   def resolveFieldGenerator[V: TypeTag]
-  (getNextIndex: CSP[V] => Option[Int], domainCalculator: DomainCalculator[V])
+  (getNextIndex: CSP[V] => Option[Int], domainCalculator: DomainCalculator[V], forward:Boolean)
   (validatorCSP: CSPProblemValidator[V]): (CSP[V], Int) => Boolean = {
     val calculateDomainOfIndex = domainCalculator.calculateDomainOfIndex
     val createVariableFromDomainValue = domainCalculator.createVariableFromDomainValue
@@ -62,7 +64,7 @@ object resolveProblem {
         domainCalculator.calculateDomainOfDependents(problem, index)
         steps = steps + 1
 
-        if (isDomainProper(problem)) {
+        if (isDomainProper(problem, forward)) {
           val indexToResolve = getNextIndex(problem)
           if (indexToResolve.isEmpty) true
 

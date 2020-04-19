@@ -7,6 +7,15 @@ import tools.sudokuTools
 import scala.io.Source.fromFile
 
 object loadQuiz {
+
+  def loadQuizes(puzzleFile: String, wordsFile: String, from:Int, to:Int) =
+    (0 to 10).map { quizNumber =>
+      val puzzleFileWithIndex = puzzleFile + quizNumber.toString
+      val wordsFileWithIndex = wordsFile + quizNumber.toString
+      loadQuiz(puzzleFileWithIndex, wordsFileWithIndex)
+    }.toList
+
+
   def loadQuiz(puzzleFile: String, wordsFile: String): CSP[QuizVariable] = {
     val bufferedSource = fromFile(puzzleFile)("UTF-8")
     val lines = bufferedSource.getLines().toList

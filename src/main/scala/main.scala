@@ -1,10 +1,10 @@
 import domainCalculations.{domainPuzzle, domainSudoku}
 import heuristics.getFirstEmptyIndexHeuristic.getFirstEmptyIndex
 import heuristics.getRandomIndexHeuristic.getRandomIndex
-import heuristics.shortestDomainSizeHeuristic.getIndexWithTheShortestDomainSize
 import heuristics.nextIndexHeuristicGenerator
+import heuristics.shortestDomainSizeHeuristic.getIndexWithTheShortestDomainSize
 import model._
-import problemCreators.{loadQuiz, loadSudokus}
+import problemCreators.{loadQuiz, loadSudokus, printProblem}
 import tools._
 import validators.{quizValidations, sudokuValidations}
 
@@ -12,22 +12,14 @@ object main {
 
   def main(args: Array[String]): Unit = {
     val sudokuFilename = "src/main/resources/ai-lab2-2020-dane/Sudoku.csv"
-    val quizNumber = 1
-    val puzzleFile = s"src/main/resources/data/puzzle${quizNumber}"
-    val wordsFile = s"src/main/resources/data/words${quizNumber}"
+    val puzzleFile = "src/main/resources/data/puzzle"
+    val wordsFile = "src/main/resources/data/words"
 
     val sudokus = loadSudokus.loadSudokus(sudokuFilename)
-    val quiz: CSP[QuizVariable] = loadQuiz.loadQuiz(puzzleFile, wordsFile)
+    val quizes = loadQuiz.loadQuizes(puzzleFile, wordsFile, from = 0, to = 10)
 
-
-    val heuristicFilterSudoku: ((Option[Int], Int)) => Boolean = {
-      case (variable: Option[Int], index: Int) =>  variable.isEmpty
-    }
-    val heuristicFilterPuzzle: ((Option[QuizVariable], Int)) => Boolean = {
-      case (variable: Option[QuizVariable], index: Int) => variable.get.value.isEmpty
-    }
-    val sudokuHeuristicGenerator = nextIndexHeuristicGenerator.createNextIndexHeuristic(heuristicFilterSudoku) _
-    val quizHeuristicGenerator = nextIndexHeuristicGenerator.createNextIndexHeuristic(heuristicFilterPuzzle) _
+    val quizHeuristicGenerator = getQuizHeuristicGenerator
+    val sudokuHeuristicGenerator = getSudokuHeuristicGenerator
 
     val sudokuLowestDomainHeuristic = sudokuHeuristicGenerator(getFirstEmptyIndex)
     val quizLowestDomainHeuristic = quizHeuristicGenerator(getIndexWithTheShortestDomainSize)
@@ -44,7 +36,7 @@ object main {
       domainPuzzle.calculateDomainOfVariableIndex[QuizVariable],
       domainPuzzle.calculateDomainOfDependents[QuizVariable],
       domainPuzzle.calculateDomainForEachVariables[QuizVariable],
-      domainPuzzle.createQuizVariable(quiz)
+      domainPuzzle.createQuizVariable
     )
 
     val sudokuResolver = resolveProblem.resolveProblem[Int](
@@ -70,31 +62,44 @@ object main {
       quizValidations.isDomainProper
     )
 
-    val results = new Array[CSPResult](sudokus.length + 1)
+    val results =
+      runAlgorithm(quizes, quizResolver, quizValidator, forwardChecking = true)
+//    runAlgorithm(sudokus, sudokuResolver, sudokuValidator, true)
 
-    sudokus.indices.foreach(i => {
-//      domainSudoku.calculateDomain(s)
-//      println(i+1)
-      val (res, time) = timer.timer({
-        //        sudokus.head.domains.foreach(println)
-        sudokuResolver(sudokus(i), sudokuValidator, false)
-      })
-      results(i) = CSPResult.apply(i + 1, time,  res)
-//      printProblem.printProblem(sudokus(i))
-
-//      printProblem.printProblem(sudokus.head)
-    })
+    quizes.foreach{q => printProblem.printProblem(q) }
     results.foreach(println)
-//
-////
-//    timer.timer({
-//      quizResolver(quiz, quizValidator, false)
-//      printProblem.printProblem(quiz)
-//      ""
-//    })
-
 
   }
 
+  def runAlgorithm[V](
+                       problems:List[CSP[V]],
+                       resolver:(CSP[V], CSPProblemValidator[V],Boolean) => CSPResult,
+                       validator:CSPProblemValidator[V],
+                       forwardChecking:Boolean
+                     ) = {
+    val results = new Array[CSPResult](problems.length)
+    problems.indices.foreach(i => {
+      val (res, time) = timer.timer(
+        resolver(problems(i), validator, forwardChecking)
+      )
+      results(i) = CSPResult.apply(i, time,  res)
+    })
+    results
+  }
+
+
+  def getQuizHeuristicGenerator = {
+    val heuristicFilterPuzzle: ((Option[QuizVariable], Int)) => Boolean = {
+      case (variable: Option[QuizVariable], index: Int) => variable.get.value.isEmpty
+    }
+    nextIndexHeuristicGenerator.createNextIndexHeuristic(heuristicFilterPuzzle) _
+  }
+
+  def getSudokuHeuristicGenerator = {
+    val heuristicFilterSudoku: ((Option[Int], Int)) => Boolean = {
+      case (variable: Option[Int], index: Int) =>  variable.isEmpty
+    }
+    nextIndexHeuristicGenerator.createNextIndexHeuristic(heuristicFilterSudoku) _
+  }
 
 }
