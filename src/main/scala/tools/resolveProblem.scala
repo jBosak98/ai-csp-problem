@@ -1,6 +1,6 @@
 package tools
 
-import model.{CSP, CSPProblemValidator, DomainCalculator, QuizVariable}
+import model.{CSP, CSPProblemValidator, CSPResult, DomainCalculator, QuizVariable}
 
 import scala.reflect.runtime.universe._
 
@@ -10,7 +10,7 @@ object resolveProblem {
 
   def resolveProblem[V: TypeTag]
   (indexSelectionHeuristic: CSP[V] => Option[Int], domainCalculator: DomainCalculator[V])
-  (problem: CSP[V], validatorCSP: CSPProblemValidator[V], forwardChecking:Boolean): Boolean = {
+  (problem: CSP[V], validatorCSP: CSPProblemValidator[V], forwardChecking:Boolean): CSPResult = {
     val position = indexSelectionHeuristic(problem)
 
     val domainCalc = if (forwardChecking) domainCalculator else DomainCalculator(
@@ -26,9 +26,12 @@ object resolveProblem {
       resolveField(problem, position.get)
     }
     println(s"steps: ${steps}")
+
     val isSolved = validatorCSP.isProperlyResolved(problem)
     if (!isSolved) println("Problem has no solution")
-    isSolved
+    val result = CSPResult(0,0L,steps, isSolved)
+    steps = 0
+    result
   }
 
   def resolveFieldGenerator[V: TypeTag]

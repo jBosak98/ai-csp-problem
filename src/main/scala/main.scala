@@ -1,10 +1,10 @@
 import domainCalculations.{domainPuzzle, domainSudoku}
 import heuristics.getFirstEmptyIndexHeuristic.getFirstEmptyIndex
 import heuristics.getRandomIndexHeuristic.getRandomIndex
-import heuristics.lowestDomainSizeHeuristic.getIndexWithTheLowestDomainSize
+import heuristics.shortestDomainSizeHeuristic.getIndexWithTheShortestDomainSize
 import heuristics.nextIndexHeuristicGenerator
 import model._
-import problemCreators.{loadQuiz, loadSudokus, printProblem}
+import problemCreators.{loadQuiz, loadSudokus}
 import tools._
 import validators.{quizValidations, sudokuValidations}
 
@@ -29,8 +29,8 @@ object main {
     val sudokuHeuristicGenerator = nextIndexHeuristicGenerator.createNextIndexHeuristic(heuristicFilterSudoku) _
     val quizHeuristicGenerator = nextIndexHeuristicGenerator.createNextIndexHeuristic(heuristicFilterPuzzle) _
 
-    val sudokuLowestDomainHeuristic = sudokuHeuristicGenerator(getIndexWithTheLowestDomainSize)
-    val quizLowestDomainHeuristic = quizHeuristicGenerator(getIndexWithTheLowestDomainSize)
+    val sudokuLowestDomainHeuristic = sudokuHeuristicGenerator(getFirstEmptyIndex)
+    val quizLowestDomainHeuristic = quizHeuristicGenerator(getIndexWithTheShortestDomainSize)
     val quizFirstEmptyHeuristic = quizHeuristicGenerator(getFirstEmptyIndex)
     val quizRandomIndexHeuristic = quizHeuristicGenerator(getRandomIndex)
 
@@ -70,22 +70,28 @@ object main {
       quizValidations.isDomainProper
     )
 
-//    sudokus.foreach(s => {
-//      domainSudoku.calculateDomain(s)
-    timer.timer({
-//        sudokus.head.domains.foreach(println)
-        sudokuResolver(sudokus.head, sudokuValidator, true)
+    val results = new Array[CSPResult](sudokus.length + 1)
 
+    sudokus.indices.foreach(i => {
+//      domainSudoku.calculateDomain(s)
+//      println(i+1)
+      val (res, time) = timer.timer({
+        //        sudokus.head.domains.foreach(println)
+        sudokuResolver(sudokus(i), sudokuValidator, false)
       })
-      printProblem.printProblem(sudokus.head)
-//    })
+      results(i) = CSPResult.apply(i + 1, time,  res)
+//      printProblem.printProblem(sudokus(i))
+
+//      printProblem.printProblem(sudokus.head)
+    })
+    results.foreach(println)
 //
 ////
-    timer.timer({
-      quizResolver(quiz, quizValidator, false)
+//    timer.timer({
+//      quizResolver(quiz, quizValidator, false)
 //      printProblem.printProblem(quiz)
 //      ""
-    })
+//    })
 
 
   }
